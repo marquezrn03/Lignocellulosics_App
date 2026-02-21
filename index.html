@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dungeons & Deconstruction - Biomass RPG</title>
+    <title>Dungeons & Deconstruction - PhD Biomass RPG</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +16,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        /* D&D Fantasy Font */
+        /* D&D Fantasy Font for UI elements */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
         
         /* Custom animations for game effects */
@@ -63,24 +63,37 @@
         const Shield = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
         const Scroll = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>;
         const Skull = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>;
+        const Microscope = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></svg>;
 
-        // --- RPG PROGRESSION DEFINITIONS ---
+        // --- RPG PROGRESSION DEFINITIONS (100% ACADEMIC THEORY) ---
+        // The RPG classes remain for gamification, but the categories are pure science.
         const categoryNames = {
-            0: "School of Composition", 1: "Arts of Pretreatment", 2: "Lignin Necromancy", 3: "Enzymatic Evocation",
-            4: "Nanocellulose Transmutation", 5: "Divination & Analytics", 6: "Thermochemical Pyromancy", 7: "Self-Assembly Dynamics"
+            0: "Biomass Composition", 
+            1: "Pretreatment Engineering", 
+            2: "Lignin Chemistry", 
+            3: "Enzymatic Catalysis",
+            4: "Nanocellulose Mechanics", 
+            5: "Advanced Characterization", 
+            6: "Thermochemical Upgrading", 
+            7: "Self-Assembly Dynamics"
         };
+        
         const levelNames = {
-            1: "Lvl 1: Apprentice Biomancer", 2: "Lvl 5: Journeyman Artificer", 3: "Lvl 10: Master Transmuter", 4: "Lvl 20: Archmage of Assembly"
+            1: "Lvl 1: Apprentice Biomancer", 
+            2: "Lvl 5: Journeyman Artificer", 
+            3: "Lvl 10: Master Transmuter", 
+            4: "Lvl 20: Archmage of Assembly"
         };
+
         const explanationsDB = {
-            0: "Divining the macroscopic ratios, allomorphs, and baseline components of native plant cell walls.",
-            1: "Brute-force and elemental magic utilized to shatter the recalcitrant matrix of lignin and hemicellulose.",
-            2: "The dark study of phenylpropanoid polymers, focusing on specific unbreakable ether and carbon-carbon curses.",
-            3: "Summoning synergistic protein familiars (hydrolases, oxidoreductases) to devour polysaccharides.",
-            4: "The high art of transmuting raw pulp into indestructible nano-scale crystalline domains.",
-            5: "Casting high-level identification spells (NMR, SAXS) to reveal the true molecular architecture.",
-            6: "Channeling absolute hellfire to rapidly deoxygenate biomass into volatile hydrocarbon elixirs.",
-            7: "Weaving entropy-driven and non-covalent enchantments to form functional supra-structures."
+            0: "Macroscopic structural analysis, crystalline allomorphs, and baseline polysaccharide/lignin distribution in native cell walls.",
+            1: "Thermochemical and physio-chemical technologies designed to fractionate the lignocellulosic matrix and overcome recalcitrance.",
+            2: "Elucidation of phenylpropanoid polymer structures, focusing on ether (β-O-4) and recalcitrant carbon-carbon (5-5') inter-unit linkages.",
+            3: "Synergistic biochemical depolymerization mechanisms utilizing highly specific hydrolytic and oxidative metalloenzymes.",
+            4: "Extraction, surface functionalization, and rheological properties of highly ordered, nano-scale cellulosic crystalline domains.",
+            5: "High-resolution analytical techniques (NMR, SAXS, Py-GC/MS) utilized to map exact native molecular architectures.",
+            6: "High-temperature and catalytic pathways engineered to rapidly depolymerize and deoxygenate biomass into drop-in biofuels.",
+            7: "Entropy-driven and non-covalent associative behaviors forming functional, hierarchical supramolecular structures."
         };
 
         // --- MASSIVE 300+ COMPRESSED KNOWLEDGE BASE ---
@@ -233,12 +246,12 @@
             ["Structural Color", "Vivid iridescent coloration produced not by pigments, but by the Bragg reflection of light from the periodic pitch of chiral nematic CNC films", 7, 4],
             ["Tactoids", "Anisotropic, spindle-shaped microscopic droplets of the chiral nematic phase that spontaneously nucleate and grow within an isotropic CNC suspension", 7, 4],
             ["Hydrotropic Extraction", "The use of highly concentrated aqueous solutions of amphiphilic salts (e.g., sodium xylenesulfonate) to radically alter water structure and dissolve lignin", 1, 4],
-            ["Lytic Polysaccharide Monooxygenase Auto-oxidation", "The highly detrimental uncoupling reaction where an LPMO erroneously reduces O2/H2O2 without cleaving a substrate, creating damaging ROS radicals", 3, 4],
+            ["LPMO Auto-oxidation", "The highly detrimental uncoupling reaction where an LPMO erroneously reduces O2/H2O2 without cleaving a substrate, creating damaging ROS radicals", 3, 4],
             ["SANS", "Small-Angle Neutron Scattering: A structural profiling tool providing deep architectural data, particularly effective when utilizing contrast matching with heavy water (D2O)", 5, 4],
             ["GPC/SEC", "Gel Permeation/Size Exclusion Chromatography: The standard technique deployed to calculate the exact molecular weight distribution (Mw, Mn, PDI) of solubilized biomass polymers", 5, 4],
             ["ATR-FTIR", "Attenuated Total Reflectance Fourier Transform Infrared spectroscopy: Utilized for ultra-rapid surface analysis of specific biomass functional group vibrations", 5, 4],
             ["AFM", "Atomic Force Microscopy: A high-resolution physical mapping tool capable of mechanically resolving individual cellulose nanofibrils and assessing their surface topography", 5, 4],
-            ["Hydrodeoxygenation (HDO)", "A severe catalytic upgrading process utilizing extreme H2 pressure and bifunctional metal-acid catalysts to completely strip oxygen from bio-oil, yielding drop-in alkanes", 6, 4],
+            ["Hydrodeoxygenation (HDO)", "A severe catalytic upgrading process utilizing extreme H2 pressure and bifunctional metal-acid catalysts to completely strip oxygen from bio-oil, yielding alkanes", 6, 4],
             ["Cellulose IV", "An extremely rare crystalline allomorph generated exclusively by heating Cellulose III to high temperatures in glycerol", 4, 4]
         ];
 
@@ -247,20 +260,20 @@
             term: String(row[0]),
             definition: String(row[1]),
             catId: Number(row[2]),
-            category: categoryNames[Number(row[2])] || "Uncharted Magic",
+            category: categoryNames[Number(row[2])] || "Specialized Sub-Discipline",
             level: Number(row[3])
         }));
         
-        // --- RPG ANCIENT TOMES (Tips) ---
-        const ancientTomes = [
-            { title: "Tome of the LPMO", content: "Ancient texts reveal LPMOs natively use H2O2 rather than O2 as their primary co-substrate. Controlling H2O2 limits non-productive enzyme auto-oxidation." },
-            { title: "Scroll of C-Lignin", content: "Unlike chaotic S/G lignins, Catechyl lignin consists entirely of benzodioxane linkages, making it exceptionally linear and ideal for self-assembling into uniform nanoparticles." },
-            { title: "The CELF Grimoire", content: "Co-solvent Enhanced Lignocellulosic Fractionation (THF/water) achieves high efficiency by completely preventing pseudo-lignin redeposition on the cellulose surface." },
-            { title: "Codex of Fluorine", content: "Introducing ultralow concentrations (0.01%) of fluorinated synthetic peptides to CNF hydrogels radically blocks water vapor transmission via non-covalent hydrophobic interlocking." },
-            { title: "Tablet of Onsager", content: "The cholesteric liquid crystalline phase of CNCs is entropy-driven. It is highly dependent on the electrostatic repulsion generated by surface sulfate half-esters from H2SO4 hydrolysis." },
-            { title: "The Superbase Switch", content: "Superbase-derived solvents (like DBU) uniquely cleave α-O-4 and C-C bonds while preserving the crucial β-O-4 ether linkages, yielding a highly upgradeable lignin stream." },
-            { title: "Curse of Pseudo-Lignin", content: "Under high severity factors, hemicellulose degrades to furfural/HMF, which aggressively polymerizes with degraded lignin fragments to form 'pseudo-lignin', severely retarding downstream enzymolysis." },
-            { title: "Zeolite Prophecy", content: "During catalytic upgrading, ZSM-5 provides shape-selective micropores that drive aromatization (yielding BTX) while sterically hindering the formation of bulky polycyclic cokes." }
+        // --- 100% STRICT ACADEMIC RESEARCH BREAKTHROUGHS (Popups) ---
+        const academicMilestones = [
+            { title: "Literature Review: LPMO Kinetics", content: "Current consensus indicates LPMOs (Lytic Polysaccharide Monooxygenases) natively utilize H2O2 rather than O2 as their primary co-substrate. Regulating exogenous H2O2 significantly mitigates enzyme auto-oxidation." },
+            { title: "Structural Discovery: C-Lignin Geometry", content: "Unlike heavily branched S/G lignins, Catechyl lignin (extracted from seed coats) consists entirely of linear benzodioxane linkages, rendering it thermodynamically ideal for self-assembling into uniform nanoparticles." },
+            { title: "Process Engineering: CELF Fractionation", content: "Co-solvent Enhanced Lignocellulosic Fractionation (THF/water) achieves >95% theoretical glucan yields by completely suppressing pseudo-lignin condensation and physically preventing its redeposition onto cellulose." },
+            { title: "Material Science: Fluorinated Peptides", content: "The introduction of ultralow concentrations (0.01 wt%) of fluorinated synthetic peptides to CNF hydrogels radically limits water vapor transmission via highly ordered, hydrophobic non-covalent interlocking." },
+            { title: "Soft Matter Physics: Cholesteric CNCs", content: "The chiral nematic liquid crystalline phase of CNCs is strictly entropy-driven (Onsager theory), but its critical concentration is heavily modulated by electrostatic repulsion stemming from surface sulfate half-esters." },
+            { title: "Solvent Chemistry: Switchable Superbases", content: "Switchable solvents derived from the non-nucleophilic superbase DBU selectively cleave α-O-4 and C-C bonds while thermodynamically preserving upgradeable β-O-4 ether linkages." },
+            { title: "Thermochemical Degradation: Pseudo-Lignin", content: "At high severity factors (log R0 > 4.0), hemicellulose degradation products (furfural/HMF) aggressively polymerize with lignin fragments, drastically increasing downstream enzymatic recalcitrance." },
+            { title: "Catalytic Upgrading: Zeolite ZSM-5 Kinetics", content: "During catalytic hydrodeoxygenation, ZSM-5 provides shape-selective acidic micropores that forcefully drive aromatization into BTX compounds while sterically hindering polycyclic coke formation." }
         ];
 
         // Format Text Utility
@@ -279,7 +292,7 @@
             const [gameState, setGameState] = useState('menu');
             const [currentEncounter, setCurrentEncounter] = useState(null);
             
-            // RPG Stats
+            // Stats
             const [xp, setXp] = useState(0);
             const [hp, setHp] = useState(3);
             const [combo, setCombo] = useState(1);
@@ -317,7 +330,7 @@
                         freshPool = conceptsDB.filter(c => !currentUsedSet.has(c.term));
                     }
                     
-                    // Extreme safety check: If they answered literally all 300 questions (impossible usually), reset memory
+                    // Extreme safety check: If they answered literally all 300 questions, reset memory
                     if (freshPool.length === 0) {
                         currentUsedSet.clear();
                         freshPool = conceptsDB.filter(c => c.level <= level);
@@ -332,9 +345,9 @@
 
                     // 3. Find Distractors (Distractors CAN be previously used terms to maintain high difficulty)
                     let distractors = conceptsDB.filter(c => c.term !== target.term);
-                    distractors = distractors.sort(() => Math.random() - 0.5); // Shuffle
+                    distractors = distractors.sort(() => Math.random() - 0.5);
 
-                    // 4. Prioritize pulling distractors from the SAME arcane school
+                    // 4. Prioritize pulling distractors from the SAME academic category
                     const sameCat = distractors.filter(c => c.catId === target.catId);
                     const otherCat = distractors.filter(c => c.catId !== target.catId);
 
@@ -343,7 +356,7 @@
                             optionsArray.push(sameCat[i].term);
                         }
                     }
-                    // 5. Fill remaining from other schools if needed
+                    // 5. Fill remaining from other disciplines if needed
                     for (let i = 0; i < otherCat.length; i++) {
                         if (optionsArray.length < 4 && !optionsArray.includes(otherCat[i].term)) {
                             optionsArray.push(otherCat[i].term);
@@ -353,7 +366,7 @@
                     // 6. Absolute rock-bottom fallback (prevents ANY black screen crashes)
                     let dummyInt = 1;
                     while (optionsArray.length < 4) {
-                        optionsArray.push(`Lost Arcana Anomaly ${dummyInt++}`);
+                        optionsArray.push(`Anomalous Structure ${dummyInt++}`);
                     }
 
                     return {
@@ -366,9 +379,9 @@
                     console.error("Encounter Gen Error:", e);
                     return {
                         compound: { category: "System Error", catId: 0 },
-                        questionText: "The arcane weave destabilizes! (System Error Recovery)",
-                        correctAnswer: "Stabilize Weave",
-                        options: ["Stabilize Weave", "Panic", "Run", "Hide"]
+                        questionText: "A critical hypothesis failure occurred in the simulation matrix.",
+                        correctAnswer: "Recalibrate Array",
+                        options: ["Recalibrate Array", "Panic", "Run", "Hide"]
                     };
                 }
             }, []);
@@ -383,7 +396,7 @@
                 const newUsedSet = new Set();
                 setUsedSpells(newUsedSet);
                 
-                const shuffledTomes = [...ancientTomes].sort(() => Math.random() - 0.5);
+                const shuffledTomes = [...academicMilestones].sort(() => Math.random() - 0.5);
                 setTomeQueue(shuffledTomes);
                 
                 setCurrentEncounter(generateEncounter(1, newUsedSet));
@@ -453,8 +466,7 @@
                 setHp(newHp);
                 setShowExplanation(false);
 
-                // Note: We do NOT banish the question if they get it wrong. They might see it again later to learn it!
-
+                // We do NOT banish the question if they get it wrong. They must learn it!
                 if (newHp <= 0) {
                     if (xp > bestXp) setBestXp(xp);
                     setGameState('gameover');
@@ -479,7 +491,7 @@
                         <div className="relative">
                         <Sparkles className="absolute -top-4 -right-4 text-cyan-400 animate-bounce" size={32} />
                         <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-                            <Sword size={48} className="text-white" />
+                            <Microscope size={48} className="text-white" />
                         </div>
                         </div>
                     </div>
@@ -487,9 +499,9 @@
                     <h1 className="text-4xl md:text-5xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-300 to-teal-300 tracking-tight font-fantasy">
                         Dungeons &<br/>Deconstruction
                     </h1>
-                    <p className="text-blue-200/70 mb-4 text-lg">The Biomancer's Quest</p>
-                    <div className="mb-10 text-xs md:text-sm bg-white/10 rounded-full py-1 px-4 text-cyan-200 inline-block border border-cyan-500/20">
-                        Zero Repetition Algorithm | 300+ Concepts
+                    <p className="text-blue-200/70 mb-4 text-lg">PhD Biomass Simulation</p>
+                    <div className="mb-10 text-[0.65rem] md:text-xs bg-white/10 rounded-full py-1.5 px-4 text-cyan-200 inline-block border border-cyan-500/20 uppercase tracking-widest font-bold">
+                        From RPG to Theory
                     </div>
                     
                     <button 
@@ -499,7 +511,7 @@
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400 opacity-70 group-hover:opacity-100 animate-pulse transition-opacity"></div>
                         <div className="relative bg-[#0B0F19] bg-opacity-90 px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all group-hover:bg-opacity-0">
                         <Play className="text-white fill-current" size={24} />
-                        <span className="text-2xl font-bold tracking-wide font-fantasy mt-1">BEGIN CAMPAIGN</span>
+                        <span className="text-2xl font-bold tracking-wide font-fantasy mt-1">BEGIN RESEARCH</span>
                         </div>
                     </button>
 
@@ -522,8 +534,8 @@
                     <div className="z-10 text-center max-w-md w-full backdrop-blur-2xl bg-[#0f1423]/80 border border-rose-500/30 p-10 rounded-3xl shadow-[0_0_50px_rgba(225,29,72,0.2)]">
                     <Skull className="mx-auto text-rose-500 mb-6" size={64} />
                     
-                    <h2 className="text-4xl font-black text-white mb-2 tracking-tight font-fantasy">TOTAL PARTY<br/>KILL</h2>
-                    <p className="text-rose-200/70 mb-8 text-lg">Your Party was Decimated by Recalcitrance!</p>
+                    <h2 className="text-4xl font-black text-white mb-2 tracking-tight font-fantasy">THESIS DEFENSE FAILED:<br/>TOTAL PARTY KILL</h2>
+                    <p className="text-rose-200/70 mb-8 text-lg">Your hypothesis was destroyed by recalcitrance!</p>
 
                     <div className="bg-white/5 rounded-2xl p-6 mb-8 border border-white/10">
                         <p className="text-sm text-slate-400 uppercase tracking-widest font-bold mb-1">Total XP Earned</p>
@@ -535,7 +547,7 @@
                         onClick={startCampaign}
                         className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold text-xl py-5 rounded-2xl flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(14,165,233,0.4)] transition-transform active:scale-95"
                     >
-                        <RotateCcw size={24} /> Resurrect Party
+                        <RotateCcw size={24} /> Resurrect Hypothesis
                     </button>
                     </div>
                 </div>
@@ -543,13 +555,13 @@
             }
 
             if (!currentEncounter) {
-                return <div className="min-h-screen bg-[#0B0F19] text-white flex items-center justify-center font-sans text-2xl animate-pulse font-fantasy">Consulting the Grimoires...</div>;
+                return <div className="min-h-screen bg-[#0B0F19] text-white flex items-center justify-center font-sans text-2xl animate-pulse font-fantasy">Reviewing Literature...</div>;
             }
 
             return (
                 <div className={`min-h-screen bg-[#0B0F19] text-white flex flex-col font-sans overflow-hidden transition-colors duration-300 ${shakeEfx ? 'animate-shake' : ''} ${glowEfx ? 'bg-emerald-950/40' : ''}`}>
                 
-                {/* SPELL FIZZLE (Failure Overlay) */}
+                {/* FAILURE OVERLAY */}
                 {showExplanation && (
                     <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300">
                     <div className="bg-[#13192B] border border-rose-500/50 p-6 md:p-8 rounded-3xl max-w-lg w-full shadow-[0_0_60px_rgba(225,29,72,0.3)] transform transition-all">
@@ -558,11 +570,11 @@
                         <div className="bg-rose-500/20 p-3 rounded-full flex-shrink-0">
                             <Skull className="text-rose-500" size={32} />
                         </div>
-                        <h2 className="text-3xl font-black text-white font-fantasy">Spell Fizzled!</h2>
+                        <h2 className="text-3xl font-black text-white font-fantasy">Hypothesis Rejected!</h2>
                         </div>
 
                         <div className="bg-white/5 rounded-2xl p-5 mb-6 border border-white/10">
-                        <p className="text-sm text-slate-400 uppercase tracking-widest font-bold mb-2">The correct incantation was:</p>
+                        <p className="text-sm text-slate-400 uppercase tracking-widest font-bold mb-2">The correct scientific concept was:</p>
                         <div className="text-2xl font-black text-emerald-400">
                             <FormatText text={currentEncounter.correctAnswer} /> 
                         </div>
@@ -570,13 +582,13 @@
 
                         <div className="bg-blue-900/30 rounded-2xl p-5 mb-8 border border-blue-500/30">
                         <div className="flex items-center gap-2 mb-2">
-                            <Scroll size={20} className="text-cyan-400" />
+                            <Microscope size={20} className="text-cyan-400" />
                             <h3 className="font-bold text-cyan-300 text-lg uppercase tracking-wide">
                             {currentEncounter.compound.category}
                             </h3>
                         </div>
                         <p className="text-blue-100/80 leading-relaxed text-[0.95rem] md:text-base italic">
-                            "{explanationsDB[currentEncounter.compound.catId] || "A forgotten arcane secret."}"
+                            "{explanationsDB[currentEncounter.compound.catId] || "A highly specialized mechanism."}"
                         </p>
                         </div>
 
@@ -590,7 +602,7 @@
                     </div>
                 )}
 
-                {/* ANCIENT TOME (Checkpoint Overlay) */}
+                {/* MILESTONE OVERLAY */}
                 {showTome && currentTome && (
                     <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300">
                     <div className="bg-[#0B1221] border border-cyan-500/50 p-6 md:p-8 rounded-3xl max-w-lg w-full shadow-[0_0_60px_rgba(6,182,212,0.3)] transform transition-all relative overflow-hidden">
@@ -602,14 +614,14 @@
                             <Scroll className="text-cyan-400" size={32} />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black text-white font-fantasy">Ancient Tome Found!</h2>
-                            <p className="text-cyan-300/70 text-sm font-bold uppercase tracking-widest">{spellsCast} Spells Mastered</p>
+                            <h2 className="text-2xl font-black text-white font-fantasy">Research Milestone Reached</h2>
+                            <p className="text-cyan-300/70 text-sm font-bold uppercase tracking-widest">{spellsCast} Concepts Mastered</p>
                         </div>
                         </div>
 
                         <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/20 rounded-2xl p-6 mb-8 border border-cyan-500/30 relative z-10">
                         <h3 className="font-bold text-cyan-300 text-lg uppercase tracking-wide mb-3 border-b border-cyan-500/30 pb-2">
-                            📖 Lore: {currentTome.title}
+                            🔬 {currentTome.title}
                         </h3>
                         <p className="text-blue-100 leading-relaxed text-base md:text-lg font-medium italic">
                             "{currentTome.content}"
@@ -620,13 +632,13 @@
                         onClick={handleCloseTome}
                         className="relative z-10 w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-xl py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_10px_20px_rgba(6,182,212,0.3)] transition-transform active:scale-95"
                         >
-                        Stow in Inventory <ArrowRight size={24} />
+                        Acknowledge Concept <ArrowRight size={24} />
                         </button>
                     </div>
                     </div>
                 )}
 
-                {/* RPG TOP BAR */}
+                {/* TOP BAR */}
                 <div className="flex justify-between items-center p-6 md:p-8 z-10 bg-gradient-to-b from-[#0B0F19] to-transparent">
                     {/* HIT POINTS */}
                     <div className="flex gap-2 flex-wrap">
@@ -668,7 +680,7 @@
                     </div>
                 </div>
 
-                {/* SPELL CASTING GRID (Options) */}
+                {/* OPTIONS GRID */}
                 <div className={`p-4 md:p-8 z-10 w-full max-w-5xl mx-auto pb-12 transition-opacity duration-300 ${(showExplanation || showTome) ? 'opacity-30 blur-sm pointer-events-none' : 'opacity-100'}`}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {currentEncounter.options.map((option, index) => {
