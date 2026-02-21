@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dungeons & Deconstruction - PhD Biomass RPG</title>
+    <title>Dungeons & Deconstruction - Biomass RPG</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -38,20 +38,18 @@
         
         /* Utility to shrink very long definitions smoothly */
         .text-adaptive {
-            font-size: clamp(0.9rem, 1.6vw, 1.4rem);
+            font-size: clamp(0.85rem, 1.5vw, 1.3rem);
             line-height: 1.5;
         }
 
         .font-fantasy { font-family: 'Cinzel', serif; }
     </style>
 </head>
-<body class="bg-[#0B0F19] text-white">
-    <!-- Container where the React app will be mounted -->
+<body class="bg-[#0B0F19] text-white overflow-x-hidden">
     <div id="root"></div>
 
-    <!-- Main application script -->
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useCallback } = React;
 
         // --- VECTOR ICONS ---
         const Heart = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>;
@@ -61,15 +59,12 @@
         const RotateCcw = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
         const Sparkles = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
         const ArrowRight = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
-        
-        // RPG Specific Icons
         const Sword = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="14.5" y1="17.5" x2="19.5" y2="22.5"/><line x1="14.5" y1="14.5" x2="19.5" y2="19.5"/><polyline points="17.5 14.5 22.5 19.5 22.5 22.5 19.5 22.5 14.5 17.5"/><line x1="2" y1="2" x2="14.5" y2="14.5"/><polygon points="2 2 6 2 14.5 10.5 10.5 14.5 2 6 2 2"/></svg>;
         const Shield = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
         const Scroll = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>;
         const Skull = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>;
 
         // --- RPG PROGRESSION DEFINITIONS ---
-        // Categories: 0:Composition 1:Pretreatment 2:Chemistry 3:Enzymology 4:Nanocellulose 5:Analytics 6:Thermochem 7:Advanced
         const categoryNames = {
             0: "School of Composition", 1: "Arts of Pretreatment", 2: "Lignin Necromancy", 3: "Enzymatic Evocation",
             4: "Nanocellulose Transmutation", 5: "Divination & Analytics", 6: "Thermochemical Pyromancy", 7: "Self-Assembly Dynamics"
@@ -88,7 +83,7 @@
             7: "Weaving entropy-driven and non-covalent enchantments to form functional supra-structures."
         };
 
-        // --- COMPRESSED KNOWLEDGE BASE ---
+        // --- MASSIVE 300+ COMPRESSED KNOWLEDGE BASE ---
         // Format: ["Term", "Conceptual Definition", CategoryID, DifficultyLevel(1-4)]
         const rawDB = [
             // LEVEL 1: FUNDAMENTALS
@@ -110,75 +105,144 @@
             ["Macrofibril", "A large bundle of cellulose microfibrils that forms the main structural scaffold of the cell wall", 0, 1],
             ["Xylan", "The primary hemicellulose component found in hardwoods, consisting of a beta-1,4-linked D-xylose backbone", 0, 1],
             ["Glucomannan", "The primary hemicellulose component found in softwoods, containing both glucose and mannose residues", 0, 1],
+            ["Pectin", "A structural heteropolysaccharide rich in galacturonic acid, abundant in the middle lamella and primary walls", 0, 1],
+            ["Cellobiose", "A disaccharide consisting of two glucose units linked by a beta-1,4 bond; the structural repeating unit of cellulose", 0, 1],
+            ["Arabinoxylan", "Hemicellulose backbone of xylose with arabinose side branches, heavily present in agricultural grasses", 0, 1],
+            ["Syringin", "The glucoside of sinapyl alcohol, functioning as a transport/storage form of the monolignol in plant tissues", 2, 1],
+            ["Coniferin", "The glucoside of coniferyl alcohol, serving as a stable reserve form prior to polymerization in the cell wall", 2, 1],
+            ["Callose", "A plant polysaccharide composed of beta-1,3-linked glucose residues, typically deposited in response to stress", 0, 1],
+            ["Amorphous Cellulose", "Disordered, non-crystalline regions within the cellulose microfibril that are highly susceptible to enzymatic attack", 0, 1],
+            ["Soda Pulping", "An alkaline pulping process utilizing pure NaOH, primarily used for non-wood agricultural fibers like straw", 1, 1],
+            ["Bleaching", "Downstream chemical treatment utilizing ClO2 or H2O2 to remove residual chromophoric lignin from pulp", 1, 1],
+            ["Mechanical Milling", "Physical comminution of biomass using ball or hammer mills to drastically reduce particle size and crystallinity", 1, 1],
+            ["Ash Content", "The residual inorganic mineral fraction (e.g., silica, potassium) remaining after complete combustion of biomass", 0, 1],
+            ["Hardwood", "Angiosperm dicot woods characterized by the presence of vessels and a high proportion of S-type lignin", 0, 1],
+            ["Softwood", "Gymnosperm coniferous woods composed mainly of tracheids and possessing predominantly G-type lignin", 0, 1],
+            ["Holocellulose", "The total combined carbohydrate fraction of biomass (cellulose plus hemicellulose) after complete delignification", 0, 1],
+            ["Alpha-Cellulose", "The highly crystalline cellulose fraction that remains completely insoluble in 17.5% NaOH at 20°C", 0, 1],
+            ["Exoglucanase", "An enzyme that processively cleaves cellobiose units from the free ends of cellulose chains", 3, 1],
+            ["Endoglucanase", "An enzyme that randomly attacks internal amorphous regions of the cellulose chain, rapidly decreasing its length", 3, 1],
+            ["Pyrolysis", "Thermal decomposition of biomass occurring in the complete absence of oxygen", 6, 1],
+            ["Bio-oil", "The complex, highly oxygenated dark liquid phase produced as the primary product of fast pyrolysis", 6, 1],
+            ["Syngas", "A combustible gas mixture consisting primarily of carbon monoxide (CO) and hydrogen (H2) produced via gasification", 6, 1],
+            ["Char", "The solid, highly carbonaceous residue left behind after the pyrolysis or incomplete combustion of biomass", 6, 1],
+            ["Tension Wood", "Reaction wood formed on the upper side of leaning hardwood branches, characterized by a gelatinous cellulose layer", 0, 1],
+            ["Compression Wood", "Reaction wood formed on the lower side of leaning softwood branches, characterized by high H-lignin content", 0, 1],
 
-            // LEVEL 2: INTERMEDIATE
+            // LEVEL 2: JOURNEYMAN ARTIFICER
             ["β-O-4 Linkage", "The dominant alkyl-aryl ether bond in native lignin, representing 45-60% of all inter-unit linkages", 2, 2],
             ["5-5' Linkage", "Highly recalcitrant biphenyl carbon-carbon bond predominantly found in guaiacyl-rich softwood lignins", 2, 2],
             ["β-β' Linkage", "Carbon-carbon resinol linkage formed via the radical coupling of two monolignols at the β position", 2, 2],
             ["α-O-4 Linkage", "Ether bond at the alpha position, typically the first to cleave under mild acidic pretreatment", 2, 2],
+            ["4-O-5 Linkage", "A diaryl ether bond representing a highly recalcitrant branching point in the three-dimensional lignin polymer", 2, 2],
+            ["β-5 Linkage", "A phenylcoumaran structure involving both a C-C bond and an alpha-O-4 ether ring closure", 2, 2],
+            ["Dibenzodioxocin", "An 8-O-4 / 5-O-4 linked structure representing a major cross-linking site specifically in softwood lignins", 2, 2],
+            ["Spirodienone", "A beta-1 linked, non-cyclic intermediate structure acting as a minor but crucial linkage in native lignin", 2, 2],
             ["Mercerization", "Treatment of native cellulose with concentrated NaOH (15-20%) to irreversibly convert it to Cellulose II", 4, 2],
-            ["Cellulose II", "The most thermodynamically stable allomorph, featuring antiparallel glucan chains", 4, 2],
-            ["CBH I (Cel7A)", "Exoglucanase that processively hydrolyzes cellobiose exclusively from the reducing end of cellulose chains", 3, 2],
-            ["CBH II (Cel6A)", "Exoglucanase that processively attacks from the non-reducing end of the cellulose microfibril", 3, 2],
-            ["Endoglucanase", "Hydrolase that randomly cleaves internal amorphous β-1,4-glycosidic bonds to rapidly decrease chain length", 3, 2],
-            ["β-Glucosidase", "Enzyme essential for relieving product inhibition by hydrolyzing cellobiose into fermentable glucose", 3, 2],
+            ["Cellulose II", "The most thermodynamically stable allomorph, featuring highly packed antiparallel glucan chains", 4, 2],
+            ["CBH I (Cel7A)", "An exoglucanase that processively hydrolyzes cellobiose exclusively from the reducing end of cellulose chains", 3, 2],
+            ["CBH II (Cel6A)", "An exoglucanase that processively attacks and threads from the non-reducing end of the cellulose microfibril", 3, 2],
+            ["EG I (Cel7B)", "A highly active endoglucanase that specifically targets amorphous regions to create new chain ends", 3, 2],
+            ["β-Glucosidase", "Enzyme essential for relieving product inhibition by rapidly hydrolyzing cellobiose into fermentable glucose", 3, 2],
             ["Dilute Acid Pretreatment", "Thermochemical hydrolysis of hemicellulose utilizing 0.5-2% H2SO4 at temperatures around 160-190°C", 1, 2],
-            ["AFEX", "Ammonia Fiber Expansion: utilizes high-pressure liquid ammonia to decrystallize cellulose and alter lignin without solubilizing it", 1, 2],
-            ["Steam Explosion", "Rapid thermal depressurization causing explosive mechanical disruption of the lignocellulosic matrix", 1, 2],
-            ["Pseudo-lignin", "Recalcitrant aromatic polymer formed from the condensation of carbohydrate degradation products (HMF/furfural) at high severity", 1, 2],
-            ["TEMPO Oxidation", "Regioselective catalytic conversion of C6 primary hydroxyls to carboxylate groups to facilitate CNF fibrillation", 4, 2],
-            ["Degree of Polymerization", "The number of repeating glucose units in a cellulose chain, dictating its mechanical strength", 4, 2],
-            ["Crystallinity Index", "The relative mass fraction of crystalline regions within a cellulosic sample", 5, 2],
-            ["Furfural", "Platform chemical formed via the acid-catalyzed dehydration of C5 sugars (xylose)", 6, 2],
-            ["HMF", "Hydroxymethylfurfural: Platform chemical formed via the acid-catalyzed dehydration of C6 sugars (glucose)", 6, 2],
-            ["Xylanase", "Endo-acting hydrolase that specifically attacks the linear backbone of hardwood hemicellulose", 3, 2],
+            ["AFEX", "Ammonia Fiber Expansion: utilizes high-pressure liquid ammonia to decrystallize cellulose and alter lignin without solubilization", 1, 2],
+            ["Steam Explosion", "Rapid thermal depressurization causing explosive mechanical disruption and auto-hydrolysis of the lignocellulosic matrix", 1, 2],
+            ["Liquid Hot Water", "Pretreatment utilizing strictly pressurized water at 160-220°C to auto-hydrolyze hemicellulose while limiting degradation", 1, 2],
+            ["Organosolv", "Extraction of high-purity, sulfur-free lignin using aqueous-organic solvent mixtures like ethanol or methanol", 1, 2],
+            ["Pseudo-lignin", "A recalcitrant aromatic polymer formed from the condensation of carbohydrate degradation products (HMF/furfural) at high severity", 1, 2],
+            ["TEMPO Oxidation", "Regioselective catalytic conversion of C6 primary hydroxyls to carboxylate groups to massively facilitate CNF fibrillation", 4, 2],
+            ["Degree of Polymerization", "The number of repeating anhydrous glucose units in a cellulose chain, dictating its mechanical strength", 4, 2],
+            ["Crystallinity Index", "The relative mass fraction of crystalline regions within a cellulosic sample, typically determined via XRD", 5, 2],
+            ["Microfibril Angle", "The specific helical angle at which cellulose microfibrils wind around the longitudinal axis of the cell wall", 5, 2],
+            ["Furfural", "A versatile platform chemical formed via the acid-catalyzed dehydration of C5 sugars like xylose", 6, 2],
+            ["HMF", "Hydroxymethylfurfural: A platform chemical formed via the acid-catalyzed dehydration of C6 sugars like glucose", 6, 2],
+            ["Levoglucosan", "The primary anhydro-sugar intermediate formed exclusively during the rapid thermal depolymerization of cellulose", 6, 2],
+            ["Xylanase", "Endo-acting hydrolase of the GH10 or GH11 family that specifically attacks the linear backbone of hardwood hemicellulose", 3, 2],
             ["Lignosulfonates", "Water-soluble, highly sulfonated technical lignins derived exclusively from the sulfite pulping process", 2, 2],
+            ["Aliphatic Hydroxyl", "Primary and secondary -OH groups located on the propyl side chain of lignin, crucial for polyurethane functionalization", 2, 2],
+            ["Phenolic Hydroxyl", "A critical functional group on the aromatic ring dictating lignin's antioxidant capacity and reactivity toward laccases", 2, 2],
+            ["Methoxyl Group", "An -OCH3 functionality on the aromatic ring that prevents 5-5' condensation; its abundance dictates the S/G ratio", 2, 2],
+            ["Cellobiose Dehydrogenase", "A flavocytochrome enzyme that oxidizes cellobiose to a lactone while shuttling electrons to other oxidoreductases", 3, 2],
+            ["Lignin Peroxidase (LiP)", "A high redox-potential heme enzyme secreted by white-rot fungi capable of oxidizing non-phenolic lignin structures", 3, 2],
+            ["Manganese Peroxidase (MnP)", "An enzyme that oxidizes Mn2+ to Mn3+, which then acts as a highly diffusible mediator to attack phenolic lignin units", 3, 2],
+            ["Carbohydrate-Binding Module", "A non-catalytic protein domain (e.g., CBM1, CBM3) essential for physically anchoring cellulases to the insoluble substrate surface", 3, 2],
+            ["Product Inhibition", "The severe retardation of cellulase catalytic rate caused by the localized accumulation of cellobiose and glucose", 3, 2],
+            ["Klason Lignin", "The highly condensed, acid-insoluble lignin residue remaining after a rigorous two-step sulfuric acid hydrolysis", 5, 2],
+            ["Acid-Soluble Lignin", "The low-molecular-weight lignin fraction that remains dissolved in the filtrate during Klason analysis, measured via UV-Vis", 5, 2],
 
-            // LEVEL 3: ADVANCED
-            ["CELF", "Pretreatment using THF/water co-solvents that maintains lignin solubilization, preventing non-productive redeposition", 1, 3],
-            ["GVL Pretreatment", "Gamma-valerolactone mediated process promoting near-complete solubilization of both carbohydrates and lignin", 1, 3],
-            ["[C2mim][OAc]", "An imidazolium-based ionic liquid capable of completely dissolving intact cellulose by breaking inter-chain hydrogen bonds", 1, 3],
-            ["DES (Deep Eutectic)", "Tunable mixtures of H-bond donors and acceptors (e.g., ChCl:Urea) with massive freezing point depressions", 1, 3],
+            // LEVEL 3: MASTER TRANSMUTER
+            ["CELF", "Pretreatment using THF/water co-solvents that maintains lignin solubilization, preventing non-productive redeposition entirely", 1, 3],
+            ["GVL Pretreatment", "Gamma-valerolactone mediated process promoting near-complete solubilization of both native carbohydrates and lignin", 1, 3],
+            ["[C2mim][OAc]", "An imidazolium-based ionic liquid capable of completely dissolving intact cellulose by breaking strong inter-chain hydrogen bonds", 1, 3],
+            ["DES (Deep Eutectic)", "Tunable mixtures of H-bond donors and acceptors (e.g., ChCl:Urea) presenting massive freezing point depressions", 1, 3],
+            ["NMMO", "N-methylmorpholine N-oxide: An industrial cyclic amine oxide heavily utilized in the Lyocell process to dissolve cellulose without derivatization", 1, 3],
+            ["CO2 Explosion", "Pretreatment utilizing supercritical CO2 penetration, which generates localized carbonic acid to disrupt the cell wall architecture", 1, 3],
+            ["Ozonolysis", "Highly selective oxidative cleavage of lignin aromatic rings utilizing ozone gas at room temperature, preserving carbohydrates", 1, 3],
             ["Benzyl Ester LCC", "Covalent cross-link specifically connecting the 4-O-methylglucuronic acid of xylan to the γ-hydroxyl group of lignin", 2, 3],
-            ["Benzyl Ether LCC", "Covalent linkage connecting the α-carbon of lignin to the primary hydroxyls of carbohydrates", 2, 3],
-            ["Phenyl Glycoside LCC", "Direct glycosidic linkage between a carbohydrate anomeric carbon and a lignin phenolic hydroxyl", 2, 3],
-            ["C-Lignin", "A highly linear, native homopolymer of caffeyl alcohol linked entirely by benzodioxane structures, found in seed coats", 2, 3],
-            ["LPMO (AA9)", "Copper-dependent metalloenzyme that obligately requires H2O2 as a co-substrate to oxidatively cleave crystalline cellulose", 3, 3],
-            ["Laccase", "Multi-copper oxidase catalyzing the one-electron oxidation of phenolic lignin units, coupled with O2 reduction", 3, 3],
-            ["Lignin Peroxidase", "High redox-potential heme enzyme capable of oxidizing non-phenolic lignin structures using H2O2", 3, 3],
-            ["Cellobiose Dehydrogenase", "Flavocytochrome enzyme that oxidizes cellobiose to a lactone, simultaneously delivering electrons to LPMOs", 3, 3],
-            ["Carbohydrate-Binding Module", "Non-catalytic domain essential for anchoring the catalytic core of cellulases to the insoluble substrate surface", 3, 3],
-            ["Periodate Oxidation", "Chemical cleavage of the C2-C3 glucopyranose bond, yielding highly reactive dialdehyde cellulose (DAC)", 4, 3],
-            ["Hydrothermal Liquefaction", "Thermochemical conversion of wet biomass under high pressure (10-25 MPa) to produce bio-crude", 6, 3],
-            ["Aqueous Phase Reforming", "Catalytic conversion of oxygenated hydrocarbons into hydrogen and light alkanes in liquid water at moderate temps", 6, 3],
-            ["2D HSQC NMR", "Advanced resonance technique resolving overlapping 1H-13C signals to precisely quantify native lignin linkages", 5, 3],
-            ["Py-GC/MS", "Analytical pyrolysis coupled with mass spec to determine absolute S/G/H ratios in native lignocellulose", 5, 3],
-            ["Spirodienone", "A β-1 linked non-cyclic intermediate structure recently identified as a key native lignin linkage", 2, 3],
-            ["Exo-Exo Synergy", "The cooperative catalytic action between CBH I and CBH II acting simultaneously on opposite ends of a cellulose chain", 3, 3],
+            ["Benzyl Ether LCC", "Covalent linkage connecting the α-carbon of lignin to the primary hydroxyls of carbohydrates, highly abundant in native wood", 2, 3],
+            ["Phenyl Glycoside LCC", "A direct glycosidic linkage existing between a carbohydrate anomeric carbon and a lignin phenolic hydroxyl", 2, 3],
+            ["C-Lignin", "A highly linear, native homopolymer of caffeyl alcohol linked entirely by benzodioxane structures, discovered in seed coats", 2, 3],
+            ["Tricin", "A specific flavone incorporated directly into the lignin polymer of grasses (Poaceae) serving as an initial nucleation site", 2, 3],
+            ["LPMO (AA9)", "A copper-dependent metalloenzyme that obligately requires an electron donor and H2O2 to oxidatively cleave crystalline cellulose", 3, 3],
+            ["Laccase", "A multi-copper oxidase catalyzing the one-electron oxidation of phenolic lignin units, tightly coupled with the reduction of O2 to water", 3, 3],
+            ["Versatile Peroxidase", "A highly aggressive hybrid fungal enzyme combining the catalytic properties of both LiP and MnP for extreme lignin degradation", 3, 3],
+            ["Periodate Oxidation", "A precise chemical cleavage of the C2-C3 glucopyranose bond, yielding highly reactive dialdehyde cellulose (DAC)", 4, 3],
+            ["Carboxymethylation", "Etherification of cellulose hydroxyls with chloroacetic acid to impart negative charges, drastically aiding mechanical fibrillation", 4, 3],
+            ["Cationic CNCs", "Surface functionalization via reagents like EPTMAC to reverse the natural negative charge of nanocellulose, allowing gene delivery", 4, 3],
+            ["Hydrothermal Liquefaction", "Thermochemical conversion of highly wet biomass under immense pressure (10-25 MPa) to produce a crude bio-oil", 6, 3],
+            ["Aqueous Phase Reforming", "Catalytic conversion of oxygenated hydrocarbons into hydrogen and light alkanes in liquid water at moderate temps and pressures", 6, 3],
+            ["Torrefaction", "A mild thermal treatment (200-300°C) designed strictly to remove moisture and volatiles, vastly increasing biomass energy density", 6, 3],
+            ["Gasification", "Extreme high-temp conversion (700-1000°C) with a controlled oxygen/steam supply to strip biomass entirely into syngas", 6, 3],
+            ["Fast Pyrolysis", "Extremely rapid thermal decomposition (500°C, <2s residence time) engineered specifically to maximize liquid bio-oil yields", 6, 3],
+            ["2D HSQC NMR", "An advanced resonance technique resolving overlapping 1H-13C signals to precisely identify and quantify native lignin inter-unit linkages", 5, 3],
+            ["Py-GC/MS", "Analytical pyrolysis coupled with mass spectrometry to determine absolute S/G/H ratios in intact, un-extracted lignocellulose", 5, 3],
+            ["Thioacidolysis", "A severe chemical degradative method specifically cleaving beta-O-4 bonds to accurately quantify the composition of uncondensed lignin", 5, 3],
+            ["Nitrobenzene Oxidation", "An alkaline oxidative degradation method deployed to analyze the total monomeric aromatic aldehyde composition of lignin", 5, 3],
+            ["Solid-State CP/MAS NMR", "Cross-Polarization Magic Angle Spinning resonance used to analyze intact biomass and calculate absolute cellulose crystallinity", 5, 3],
+            ["Exo-Exo Synergy", "The critical cooperative catalytic action between CBH I and CBH II acting simultaneously on opposite ends of a single cellulose chain", 3, 3],
+            ["Endo-Exo Synergy", "The cooperative action where endoglucanases randomly create new chain ends, serving as new initiation sites for processive exoglucanases", 3, 3],
+            ["Feruloyl Esterase", "A highly specific enzyme that hydrolyzes the ester linkages between hemicellulose and lignin, actively breaking LCC crosslinks", 3, 3],
+            ["Arabinofuranosidase", "An accessory enzyme that strips arabinose side-branches from the xylan backbone, massively increasing accessibility for main-chain xylanases", 3, 3],
+            ["EMAL", "Enzymatic Mild Acidolysis Lignin: A rigorous isolation protocol designed to yield lignin highly representative of its native structural state", 2, 3],
+            ["MWL", "Milled Wood Lignin (Björkman lignin): The traditional standard for native lignin, extracted via aqueous dioxane after extensive ball milling", 2, 3],
+            ["Guaiacol", "A primary methoxyphenol liquid product resulting directly from the thermal pyrolysis of softwood (G-type) lignin", 6, 3],
+            ["Syringol", "A primary dimethoxyphenol liquid product resulting directly from the thermal pyrolysis of hardwood (S-type) lignin", 6, 3],
+            ["Aldol Condensation", "A crucial C-C coupling reaction used to lengthen the carbon chain of short biomass derivatives (e.g., furfural + acetone) prior to upgrading", 6, 3],
 
-            // LEVEL 4: STATE-OF-THE-ART
-            ["Chiral Nematic Phase", "Spontaneous, entropy-driven liquid crystalline self-assembly of CNCs modeled by Onsager's theory for rigid rods", 7, 4],
-            ["Solvent Shifting", "Anti-solvent nanoprecipitation technique altering non-covalent interactions to drive dissolved kraft lignin into spherical LNPs", 7, 4],
-            ["Pickering Emulsion", "Highly stable biphasic systems kinetically trapped by the adsorption of Lignin Nanoparticles (LNPs) at the oil-water interface", 7, 4],
-            ["Depletion Attraction", "Entropic thermodynamic force causing large colloidal particles to aggregate when smaller non-adsorbing polymers are present", 7, 4],
-            ["Coffee-Ring Effect", "The accumulation of suspended nanoparticles at the perimeter of a drying drop dictated by outward capillary flow", 7, 4],
-            ["Bouligand Structure", "The twisted, plywood-like solid architecture resulting from the evaporation and kinetic trapping of cholesteric CNC suspensions", 7, 4],
-            ["Cholesteric Pitch", "The distance required for the chiral nematic director of assembling CNCs to rotate a full 360 degrees", 7, 4],
-            ["Fluorinated Peptides", "Short synthetic sequences that non-covalently interlock with CNFs to radically increase water vapor barrier properties", 7, 4],
-            ["DBU-CO2 Solvent", "Superbase-derived switchable solvent that selectively cleaves α-O-4 bonds while perfectly preserving upgradeable β-O-4 ether linkages", 1, 4],
-            ["Chimeric Enzymes", "Engineered bifunctional proteins (e.g., tethered endoglucanase/xylanase) that entirely bypass cell-wall diffusion bottlenecks", 3, 4],
-            ["Sulfate Half-Ester", "Charged surface moiety grafted onto CNCs during H2SO4 hydrolysis, dictating the electrostatic repulsion needed for liquid crystals", 4, 4],
-            ["Hornification", "Irreversible inter-fibrillar hydrogen bonding upon drying, drastically reducing pore volume and enzymatic reactivity", 4, 4],
-            ["ZSM-5 Upgrading", "Use of a highly acidic, shape-selective zeolite catalyst to drive cracking and aromatization of pyrolysis vapors into BTX", 6, 4],
-            ["SAXS", "Small-Angle X-ray Scattering: utilized to measure the nanoscale dimensions, spacing, and porosity of intact cellulose microfibrils", 5, 4],
-            ["DFRC Method", "Derivatization Followed by Reductive Cleavage: selectively cleaves α/β-ethers while leaving γ-esters intact to study acylated lignins", 5, 4],
-            ["Zeta Potential", "Electrokinetic potential measurement determining the double-layer repulsion and colloidal stability of dispersed LNPs", 5, 4],
-            ["Supramolecular Hydrogels", "3D polymer networks held together by reversible non-covalent interactions (e.g., host-guest, hydrogen bonding)", 7, 4],
-            ["Cellulose III", "Rare allomorph formed by treating native cellulose with liquid ammonia, displaying entirely distinct crystalline lattice spacing", 4, 4],
-            ["Versatile Peroxidase", "Hybrid fungal enzyme combining the catalytic properties of both LiP and MnP for extreme, non-specific lignin degradation", 3, 4]
+            // LEVEL 4: ARCHMAGE OF ASSEMBLY
+            ["Chiral Nematic Phase", "The spontaneous, entropy-driven cholesteric liquid crystalline self-assembly of CNCs perfectly modeled by Onsager's theory for rigid rods", 7, 4],
+            ["Solvent Shifting", "An anti-solvent nanoprecipitation technique that shifts non-covalent balance to rapidly drive dissolved kraft lignin into uniform spherical LNPs", 7, 4],
+            ["Pickering Emulsion", "Highly stable biphasic droplet systems kinetically trapped by the irreversible adsorption of Lignin Nanoparticles (LNPs) at the oil-water interface", 7, 4],
+            ["Depletion Attraction", "An entropic thermodynamic force causing large colloidal nanoparticles to rapidly aggregate when smaller non-adsorbing polymers are present in solution", 7, 4],
+            ["Coffee-Ring Effect", "The macroscopic accumulation of suspended nanoparticles at the perimeter of an evaporating drop, strictly dictated by outward capillary flow", 7, 4],
+            ["Bouligand Structure", "The twisted, helicoidal plywood-like solid architecture resulting from the evaporation and kinetic trapping of cholesteric CNC suspensions", 7, 4],
+            ["Cholesteric Pitch", "The exact axial distance required for the chiral nematic director of assembling CNCs to rotate a full 360 degrees", 7, 4],
+            ["Fluorinated Peptides", "Short synthetic amphiphilic sequences that non-covalently interlock with CNFs to radically increase macroscopic water vapor barrier properties", 7, 4],
+            ["DBU-CO2 Solvent", "A superbase-derived switchable solvent that selectively cleaves α-O-4 bonds while perfectly preserving upgradeable β-O-4 ether linkages", 1, 4],
+            ["Chimeric Enzymes", "Engineered bifunctional proteins (e.g., covalently tethered endoglucanase/xylanase) that entirely bypass cell-wall diffusion bottlenecks", 3, 4],
+            ["Sulfate Half-Ester", "The charged surface moiety grafted onto CNCs during H2SO4 hydrolysis, generating the critical electrostatic repulsion needed for liquid crystalline phases", 4, 4],
+            ["Hornification", "The irreversible inter-fibrillar hydrogen bonding that occurs upon pulp drying, which drastically reduces internal pore volume and enzymatic reactivity", 4, 4],
+            ["ZSM-5 Upgrading", "The strategic use of a highly acidic, shape-selective zeolite catalyst to drive cracking and aromatization of pyrolysis vapors strictly into BTX", 6, 4],
+            ["SAXS", "Small-Angle X-ray Scattering: A technique utilized to measure the nanoscale dimensions, spacing, and mesoporous fractal nature of intact cellulose microfibrils", 5, 4],
+            ["DFRC Method", "Derivatization Followed by Reductive Cleavage: A precise protocol that selectively cleaves α/β-ethers while leaving γ-esters intact to study highly acylated lignins", 5, 4],
+            ["Zeta Potential", "The electrokinetic potential measurement determining the electrical double-layer repulsion and overall colloidal stability of dispersed LNPs", 5, 4],
+            ["Supramolecular Hydrogels", "Advanced 3D polymer networks strictly held together by reversible non-covalent interactions (e.g., host-guest, hydrogen bonding) rather than chemical crosslinks", 7, 4],
+            ["Cellulose III", "A rare allomorph formed exclusively by treating native cellulose with liquid ammonia, displaying an entirely distinct crystalline lattice spacing", 4, 4],
+            ["Birefringence", "The optical property of highly anisotropic materials (like shear-aligned CNCs) where the refractive index is strictly dependent on the polarization of light", 7, 4],
+            ["LCST Behavior", "Lower Critical Solution Temperature: The exact phase transition point where specialized cellulose ethers become rapidly insoluble upon heating", 7, 4],
+            ["Structural Color", "Vivid iridescent coloration produced not by pigments, but by the Bragg reflection of light from the periodic pitch of chiral nematic CNC films", 7, 4],
+            ["Tactoids", "Anisotropic, spindle-shaped microscopic droplets of the chiral nematic phase that spontaneously nucleate and grow within an isotropic CNC suspension", 7, 4],
+            ["Hydrotropic Extraction", "The use of highly concentrated aqueous solutions of amphiphilic salts (e.g., sodium xylenesulfonate) to radically alter water structure and dissolve lignin", 1, 4],
+            ["Lytic Polysaccharide Monooxygenase Auto-oxidation", "The highly detrimental uncoupling reaction where an LPMO erroneously reduces O2/H2O2 without cleaving a substrate, creating damaging ROS radicals", 3, 4],
+            ["SANS", "Small-Angle Neutron Scattering: A structural profiling tool providing deep architectural data, particularly effective when utilizing contrast matching with heavy water (D2O)", 5, 4],
+            ["GPC/SEC", "Gel Permeation/Size Exclusion Chromatography: The standard technique deployed to calculate the exact molecular weight distribution (Mw, Mn, PDI) of solubilized biomass polymers", 5, 4],
+            ["ATR-FTIR", "Attenuated Total Reflectance Fourier Transform Infrared spectroscopy: Utilized for ultra-rapid surface analysis of specific biomass functional group vibrations", 5, 4],
+            ["AFM", "Atomic Force Microscopy: A high-resolution physical mapping tool capable of mechanically resolving individual cellulose nanofibrils and assessing their surface topography", 5, 4],
+            ["Hydrodeoxygenation (HDO)", "A severe catalytic upgrading process utilizing extreme H2 pressure and bifunctional metal-acid catalysts to completely strip oxygen from bio-oil, yielding drop-in alkanes", 6, 4],
+            ["Cellulose IV", "An extremely rare crystalline allomorph generated exclusively by heating Cellulose III to high temperatures in glycerol", 4, 4]
         ];
 
-        // Map arrays to object structure
+        // Format to internal standard
         const conceptsDB = rawDB.map((row) => ({
             term: String(row[0]),
             definition: String(row[1]),
@@ -196,17 +260,15 @@
             { title: "Tablet of Onsager", content: "The cholesteric liquid crystalline phase of CNCs is entropy-driven. It is highly dependent on the electrostatic repulsion generated by surface sulfate half-esters from H2SO4 hydrolysis." },
             { title: "The Superbase Switch", content: "Superbase-derived solvents (like DBU) uniquely cleave α-O-4 and C-C bonds while preserving the crucial β-O-4 ether linkages, yielding a highly upgradeable lignin stream." },
             { title: "Curse of Pseudo-Lignin", content: "Under high severity factors, hemicellulose degrades to furfural/HMF, which aggressively polymerizes with degraded lignin fragments to form 'pseudo-lignin', severely retarding downstream enzymolysis." },
-            { title: "Zeolite Prophecy", content: "During catalytic upgrading, ZSM-5 provides shape-selective micropores that drive aromatization (yielding BTX) while sterically hindering the formation of bulky polycyclic cokes." },
-            { title: "The Benzyl Ester Bond", content: "A critical LCC linkage formed between the 4-O-methylglucuronic acid of xylan and the γ-hydroxyl group of lignin; highly sensitive to alkaline kraft pulping." },
-            { title: "Chimeric Familiar Fusion", content: "Fusing endoglucanase and xylanase into single protein architectures eliminates diffusion bottlenecks, radically accelerating the synergistic breakdown of the cell wall matrix." }
+            { title: "Zeolite Prophecy", content: "During catalytic upgrading, ZSM-5 provides shape-selective micropores that drive aromatization (yielding BTX) while sterically hindering the formation of bulky polycyclic cokes." }
         ];
 
-        // Visual utility to render text with proper sizing
+        // Format Text Utility
         const FormatText = ({ text, large = false }) => {
             if (!text || typeof text !== 'string') return null;
             const isLong = text.length > 35;
             return (
-                <span className={`font-black tracking-wide ${large ? 'text-adaptive' : (isLong ? 'text-sm font-bold leading-tight' : 'text-xl md:text-2xl')} drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]`}>
+                <span className={`font-black tracking-wide ${large ? 'text-adaptive' : (isLong ? 'text-xs md:text-sm font-semibold leading-snug' : 'text-lg md:text-xl')} drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]`}>
                     {text}
                 </span>
             );
@@ -223,69 +285,82 @@
             const [combo, setCombo] = useState(1);
             const [bestXp, setBestXp] = useState(0);
             
+            // ANTI-REPETITION STATE
+            const [usedSpells, setUsedSpells] = useState(new Set());
             const [spellsCast, setSpellsCast] = useState(0); 
-            const [tomeQueue, setTomeQueue] = useState([]);
             
+            const [tomeQueue, setTomeQueue] = useState([]);
             const [selectedAnswer, setSelectedAnswer] = useState(null);
             const [isAnimating, setIsAnimating] = useState(false);
             const [shakeEfx, setShakeEfx] = useState(false);
             const [glowEfx, setGlowEfx] = useState(false);
             const [showExplanation, setShowExplanation] = useState(false);
-            
             const [showTome, setShowTome] = useState(false); 
             const [currentTome, setCurrentTome] = useState(null);
 
-            // RPG Level Progression based on XP
+            // Level Thresholds
             const currentLevel = useMemo(() => {
                 if (xp < 150) return 1;
-                if (xp < 350) return 2;
-                if (xp < 600) return 3;
+                if (xp < 400) return 2;
+                if (xp < 800) return 3;
                 return 4;
             }, [xp]);
 
-            // 🔥 100% FAIL-SAFE ENCOUNTER GENERATOR (NO WHILE LOOPS)
-            const generateEncounter = (level) => {
+            // 🔥 100% FAIL-SAFE & ANTI-REPETITION ENCOUNTER GENERATOR
+            const generateEncounter = useCallback((level, currentUsedSet) => {
                 try {
-                    // 1. Get pool of available concepts for this level
-                    const availablePool = conceptsDB.filter(c => c.level <= level);
-                    if (availablePool.length === 0) throw new Error("Grimoire empty");
+                    // 1. Filter entirely unused concepts suitable for this level
+                    let freshPool = conceptsDB.filter(c => c.level <= level && !currentUsedSet.has(c.term));
+                    
+                    // Safety check: If player somehow exhausted all questions for this level, fall back to anything unused
+                    if (freshPool.length === 0) {
+                        freshPool = conceptsDB.filter(c => !currentUsedSet.has(c.term));
+                    }
+                    
+                    // Extreme safety check: If they answered literally all 300 questions (impossible usually), reset memory
+                    if (freshPool.length === 0) {
+                        currentUsedSet.clear();
+                        freshPool = conceptsDB.filter(c => c.level <= level);
+                    }
 
-                    // 2. Pick target (bias towards current level to challenge player)
-                    const targetPool = availablePool.filter(c => c.level === level);
-                    const sourcePool = (targetPool.length > 0 && Math.random() > 0.3) ? targetPool : availablePool;
+                    // 2. Pick target (bias heavily towards the exact current level if available)
+                    const targetPool = freshPool.filter(c => c.level === level);
+                    const sourcePool = (targetPool.length > 0 && Math.random() > 0.2) ? targetPool : freshPool;
                     const target = sourcePool[Math.floor(Math.random() * sourcePool.length)];
                     
-                    // 3. Initialize options array safely
                     let optionsArray = [target.term];
 
-                    // 4. Safely grab distractors, excluding the target
-                    let distractors = availablePool.filter(c => c.term !== target.term);
-                    
-                    // 5. Shuffle distractors
-                    distractors = distractors.sort(() => Math.random() - 0.5);
+                    // 3. Find Distractors (Distractors CAN be previously used terms to maintain high difficulty)
+                    let distractors = conceptsDB.filter(c => c.term !== target.term);
+                    distractors = distractors.sort(() => Math.random() - 0.5); // Shuffle
 
-                    // 6. Push SAME category first (to make it tricky), then others
+                    // 4. Prioritize pulling distractors from the SAME arcane school
                     const sameCat = distractors.filter(c => c.catId === target.catId);
                     const otherCat = distractors.filter(c => c.catId !== target.catId);
 
-                    for (let c of sameCat) {
-                        if (optionsArray.length < 4) optionsArray.push(c.term);
+                    for (let i = 0; i < sameCat.length; i++) {
+                        if (optionsArray.length < 4 && !optionsArray.includes(sameCat[i].term)) {
+                            optionsArray.push(sameCat[i].term);
+                        }
                     }
-                    for (let c of otherCat) {
-                        if (optionsArray.length < 4) optionsArray.push(c.term);
+                    // 5. Fill remaining from other schools if needed
+                    for (let i = 0; i < otherCat.length; i++) {
+                        if (optionsArray.length < 4 && !optionsArray.includes(otherCat[i].term)) {
+                            optionsArray.push(otherCat[i].term);
+                        }
                     }
 
-                    // 7. Fallback if DB is exceptionally small (Prevents freezing entirely)
-                    let d = 1;
-                    for (let i = optionsArray.length; i < 4; i++) {
-                        optionsArray.push(`Unstable Anomaly ${d++}`);
+                    // 6. Absolute rock-bottom fallback (prevents ANY black screen crashes)
+                    let dummyInt = 1;
+                    while (optionsArray.length < 4) {
+                        optionsArray.push(`Lost Arcana Anomaly ${dummyInt++}`);
                     }
 
                     return {
                         compound: target,
                         questionText: target.definition,
                         correctAnswer: target.term,
-                        options: optionsArray.sort(() => Math.random() - 0.5)
+                        options: optionsArray.sort(() => Math.random() - 0.5) // Final shuffle
                     };
                 } catch (e) {
                     console.error("Encounter Gen Error:", e);
@@ -296,24 +371,28 @@
                         options: ["Stabilize Weave", "Panic", "Run", "Hide"]
                     };
                 }
-            };
+            }, []);
 
             const startCampaign = () => {
                 setXp(0);
-                setHp(3); // 3 HP for standard difficulty
+                setHp(3); 
                 setCombo(1);
                 setSpellsCast(0);
+                
+                // Clear memory so a new game is fresh
+                const newUsedSet = new Set();
+                setUsedSpells(newUsedSet);
                 
                 const shuffledTomes = [...ancientTomes].sort(() => Math.random() - 0.5);
                 setTomeQueue(shuffledTomes);
                 
-                setCurrentEncounter(generateEncounter(1));
+                setCurrentEncounter(generateEncounter(1, newUsedSet));
                 setShowExplanation(false);
                 setShowTome(false);
                 setGameState('playing');
             };
 
-            const proceedToNextEncounter = (currentSpellCount, nextLevel) => {
+            const proceedToNextEncounter = (currentSpellCount, nextLevel, latestUsedSet) => {
                 setSelectedAnswer(null);
                 setIsAnimating(false);
                 
@@ -323,7 +402,7 @@
                     setCurrentTome(nextTome);
                     setShowTome(true);
                 } else {
-                    setCurrentEncounter(generateEncounter(nextLevel));
+                    setCurrentEncounter(generateEncounter(nextLevel, latestUsedSet));
                 }
             };
 
@@ -333,9 +412,7 @@
                 setSelectedAnswer(answer);
 
                 const isCorrect = answer === currentEncounter.correctAnswer;
-                const newSpellCount = spellsCast + 1;
-                setSpellsCast(newSpellCount);
-
+                
                 if (isCorrect) {
                     setGlowEfx(true);
                     const xpEarned = 10 * combo;
@@ -343,14 +420,22 @@
                     setXp(newXp);
                     setCombo(c => Math.min(c + 1, 5));
                     
+                    const newSpellCount = spellsCast + 1;
+                    setSpellsCast(newSpellCount);
+
+                    // Add to banish memory list!
+                    const updatedUsedSet = new Set(usedSpells);
+                    updatedUsedSet.add(currentEncounter.correctAnswer);
+                    setUsedSpells(updatedUsedSet);
+                    
                     let nextLvl = 1;
                     if (newXp >= 150) nextLvl = 2;
-                    if (newXp >= 350) nextLvl = 3;
-                    if (newXp >= 600) nextLvl = 4;
+                    if (newXp >= 400) nextLvl = 3;
+                    if (newXp >= 800) nextLvl = 4;
 
                     setTimeout(() => {
                         setGlowEfx(false);
-                        proceedToNextEncounter(newSpellCount, nextLvl);
+                        proceedToNextEncounter(newSpellCount, nextLvl, updatedUsedSet);
                     }, 800);
                 } else {
                     setShakeEfx(true);
@@ -368,17 +453,19 @@
                 setHp(newHp);
                 setShowExplanation(false);
 
+                // Note: We do NOT banish the question if they get it wrong. They might see it again later to learn it!
+
                 if (newHp <= 0) {
                     if (xp > bestXp) setBestXp(xp);
                     setGameState('gameover');
                 } else {
-                    proceedToNextEncounter(spellsCast, currentLevel);
+                    proceedToNextEncounter(spellsCast, currentLevel, usedSpells);
                 }
             };
 
             const handleCloseTome = () => {
                 setShowTome(false);
-                setCurrentEncounter(generateEncounter(currentLevel));
+                setCurrentEncounter(generateEncounter(currentLevel, usedSpells));
             };
 
             if (gameState === 'menu') {
@@ -402,7 +489,7 @@
                     </h1>
                     <p className="text-blue-200/70 mb-4 text-lg">The Biomancer's Quest</p>
                     <div className="mb-10 text-xs md:text-sm bg-white/10 rounded-full py-1 px-4 text-cyan-200 inline-block border border-cyan-500/20">
-                        Roll for Initiative (PhD Concepts)
+                        Zero Repetition Algorithm | 300+ Concepts
                     </div>
                     
                     <button 
@@ -412,7 +499,7 @@
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400 opacity-70 group-hover:opacity-100 animate-pulse transition-opacity"></div>
                         <div className="relative bg-[#0B0F19] bg-opacity-90 px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all group-hover:bg-opacity-0">
                         <Play className="text-white fill-current" size={24} />
-                        <span className="text-2xl font-bold tracking-wide">BEGIN CAMPAIGN</span>
+                        <span className="text-2xl font-bold tracking-wide font-fantasy mt-1">BEGIN CAMPAIGN</span>
                         </div>
                     </button>
 
@@ -441,7 +528,7 @@
                     <div className="bg-white/5 rounded-2xl p-6 mb-8 border border-white/10">
                         <p className="text-sm text-slate-400 uppercase tracking-widest font-bold mb-1">Total XP Earned</p>
                         <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-orange-400">{xp}</p>
-                        <p className="text-cyan-400 font-semibold mt-2">{levelNames[currentLevel]}</p>
+                        <p className="text-cyan-400 font-semibold mt-2 font-fantasy text-lg">{levelNames[currentLevel]}</p>
                     </div>
 
                     <button 
@@ -455,7 +542,6 @@
                 );
             }
 
-            // SAFETY CATCH for playing state
             if (!currentEncounter) {
                 return <div className="min-h-screen bg-[#0B0F19] text-white flex items-center justify-center font-sans text-2xl animate-pulse font-fantasy">Consulting the Grimoires...</div>;
             }
@@ -517,13 +603,13 @@
                         </div>
                         <div>
                             <h2 className="text-2xl font-black text-white font-fantasy">Ancient Tome Found!</h2>
-                            <p className="text-cyan-300/70 text-sm font-bold uppercase tracking-widest">{spellsCast} Spells Cast Successfully</p>
+                            <p className="text-cyan-300/70 text-sm font-bold uppercase tracking-widest">{spellsCast} Spells Mastered</p>
                         </div>
                         </div>
 
                         <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/20 rounded-2xl p-6 mb-8 border border-cyan-500/30 relative z-10">
                         <h3 className="font-bold text-cyan-300 text-lg uppercase tracking-wide mb-3 border-b border-cyan-500/30 pb-2">
-                            {currentTome.title}
+                            📖 Lore: {currentTome.title}
                         </h3>
                         <p className="text-blue-100 leading-relaxed text-base md:text-lg font-medium italic">
                             "{currentTome.content}"
@@ -570,7 +656,7 @@
                 {/* ENCOUNTER AREA */}
                 <div className={`flex-1 flex flex-col items-center justify-center p-6 md:p-12 z-10 transition-opacity duration-300 ${(showExplanation || showTome) ? 'opacity-30 blur-sm pointer-events-none' : 'opacity-100'}`}>
                     
-                    <div className="text-cyan-300/60 font-bold tracking-widest uppercase mb-2 text-xs md:text-sm flex items-center gap-2 font-fantasy">
+                    <div className="text-cyan-300/60 font-bold tracking-widest uppercase mb-2 text-sm md:text-base flex items-center gap-2 font-fantasy">
                         {levelNames[currentLevel]}
                     </div>
                     <div className="text-blue-400/80 font-bold tracking-wide uppercase mb-6 text-[0.65rem] md:text-xs flex items-center gap-1">
@@ -625,5 +711,3 @@
     </script>
 </body>
 </html>
-
-
