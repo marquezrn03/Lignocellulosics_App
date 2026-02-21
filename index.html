@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Alchemist - Chemistry Game</title>
+    <title>Ligno-Alchemist - PhD Biomass Mechanics</title>
     
-    <!-- Tailwind CSS (CDN for rapid styling) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- React Libraries -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel (to transpile JSX directly in the browser) -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        /* Custom animations for game effects */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-10px); }
@@ -29,751 +28,577 @@
         .animate-shake {
             animation: shake 0.4s ease-in-out;
         }
+        
+        /* Utility to shrink very long definitions smoothly */
+        .text-adaptive {
+            font-size: clamp(0.75rem, 1.2vw, 1.15rem);
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body class="bg-[#0B0F19] text-white">
-    <!-- Container where the React app will be mounted -->
     <div id="root"></div>
 
-    <!-- Main application script -->
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useMemo } = React;
 
         // --- VECTOR ICONS ---
-        const Heart = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-        );
-        const Zap = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        );
-        const Trophy = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-        );
-        const Play = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="6 3 20 12 6 21 6 3"/></svg>
-        );
-        const RotateCcw = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        );
-        const AlertTriangle = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
-        );
-        const Sparkles = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-        );
-        const Flame = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-        );
-        const Info = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
-        );
-        const CheckCircle = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-        );
-        const XCircle = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-        );
-        const ArrowRight = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        );
-        const Lightbulb = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-        );
+        const Heart = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>;
+        const Zap = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+        const Trophy = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
+        const Play = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="6 3 20 12 6 21 6 3"/></svg>;
+        const RotateCcw = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>;
+        const AlertTriangle = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>;
+        const Sparkles = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>;
+        const Flame = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>;
+        const Info = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>;
+        const CheckCircle = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>;
+        const XCircle = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const ArrowRight = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
+        const Lightbulb = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>;
 
-
-        // --- DICTIONARY OF EXPLANATIONS (Theory) ---
+        // --- PHD CATEGORY THEORY (Feedback Database) ---
         const explanationsDB = {
-        'Element': "Formed by atoms of a single element. Note that some elements (gases and halogens) appear in diatomic form (e.g., O2, Cl2).",
-        'Metal oxide': "Oxygen acts with an oxidation state of -2. It exchanges with the metal's valence, and the subscripts are simplified if both are even.",
-        'Non-metal oxide': "Oxygen (-2) binds to a non-metal. In traditional nomenclature, they were often called 'anhydrides'.",
-        'Peroxide': "They contain the peroxide group (O2) with a combined valence of -2. The O-O bond cannot be simplified, which is why you'll see seemingly unsimplified subscripts (e.g., H2O2).",
-        'Metal hydride': "Hydrogen acts with an oxidation state of -1 when binding to a metal.",
-        'Non-metal hydride': "Special hydrides (groups 13, 14, 15) where hydrogen acts with +1. They have traditional common names widely used (ammonia, methane, silane...).",
-        'Binary acid': "Hydrides of non-metals from groups 16 and 17, or pseudohalogens (CN). As a gas, they end in '-ide', and in aqueous solution, they are named 'hydro-...-ic acid'.",
-        'Binary salt': "Union of a metal and a non-metal (or cyanide group). The electronegative element uses its negative valence and adds the suffix '-ide'.",
-        'Covalent salt': "Union of two non-metals. The most electronegative one is written on the right and takes the suffix '-ide'.",
-        'Hydroxide': "Compounds with the (OH) group, which has an overall valence of -1. It binds to a metal, exchanging this valence.",
-        'Oxoacid': "Acids containing oxygen. Formed theoretically by adding water (H2O) to a non-metal oxide. They use prefixes and suffixes for the central element (hypo-...-ous, ...-ous, ...-ic, per-...-ic).",
-        'Polyhydrated oxoacid': "Obtained by adding multiple water molecules to the anhydride. Prefixes indicate the degree of hydration: meta- (1 H2O), pyro- or di- (2 H2O), ortho- (3 H2O).",
-        'Oxosalt': "Derived from oxoacids by replacing hydrogens with a metal. The acid suffixes change: '-ous' becomes '-ite', and '-ic' becomes '-ate'.",
-        'Acid salt': "Salts that still retain some hydrogen from the original acid. They are named by adding the prefix 'hydrogen-' or 'dihydrogen-' before the anion's name.",
-        'Hydrated salt': "Salts containing water of crystallization in their structure. Indicated by a Greek numeral prefix followed by the word '-hydrate'."
+            'Deconstruction': "Pretreatment technologies designed to overcome recalcitrance by breaking the physical/chemical barrier of lignin and hemicellulose, exposing crystalline cellulose for subsequent valorization.",
+            'Lignin Chemistry': "Complex, irregular polymers of phenylpropanoid units (H, G, S). Reactivity is heavily dictated by inter-unit linkages (e.g., β-O-4, 5-5') and phenolic hydroxyl content.",
+            'Nanocellulose': "Highly ordered nano-scale cellulosic domains extracted via mechanical shearing (CNF) or acid hydrolysis (CNC). Characterized by immense tensile strength and functionalizable surface hydroxyls.",
+            'Enzyme Catalysis': "Biological deconstruction utilizing synergistic cocktails (e.g., cellobiohydrolases, endoglucanases, and LPMOs) to depolymerize polysaccharides into fermentable sugars.",
+            'Adv. Solvents': "Next-generation liquid systems (e.g., DES, Switchable Solvents, Ionic Liquids) engineered to selectively fractionate biomass components under milder thermodynamic conditions.",
+            'Thermochemical': "High-temperature and/or catalytic pathways (HDO, Fast Pyrolysis) engineered to rapidly depolymerize and deoxygenate biomass into hydrocarbon fuels or platform chemicals.",
+            'Self-Assembly': "Entropy-driven and non-covalent associative behaviors of biomass derivatives (e.g., CNC chiral nematic phases, LNP Pickering emulsions) to form functional supra-structures.",
+            'Characterization': "Advanced analytical techniques (2D HSQC NMR, SAXS, Py-GC/MS) utilized to elucidate the precise molecular architecture and linkage ratios within lignocellulosic matrices."
         };
 
-        // --- ADVANCED TIPS (Randomized, no repetition for difficult concepts) ---
+        // --- ADVANCED 2026 LEARNING TIPS (Triggered every 5 questions) ---
         const advancedTips = [
-            { title: "Elements (Gases)", content: "Gases like oxygen, hydrogen, nitrogen, or halogens (fluorine, iodine...) travel in pairs! If asked for the formula of oxygen gas, it's always O2, not O. The famous exception is ozone (O3)." },
-            { title: "Oxosalts (Suffix change)", content: "Mnemonic rule: 'I ATE something ICky, SprITE is deliciOUS'. Acids ending in '-ous' form salts ending in '-ite'. Acids ending in '-ic' form salts ending in '-ate'." },
-            { title: "Oxoacids (Valences)", content: "Remember the table for non-metals: valences 1-2 (hypo...ous), 3-4 (...ous), 5-6 (...ic), 7 (per...ic). Ex: Chlorine with valence 7 forms perchloric acid." },
-            { title: "Polyhydrated Acids", content: "Watch out for phosphorus, arsenic, and antimony! Prefix 'meta-' (1 H2O), 'pyro-' or 'di-' (2 H2O), and 'ortho-' (3 H2O). Note that the prefix 'ortho-' is often omitted, which is why phosphoric acid is H3PO4." },
-            { title: "Binary vs Oxoacids", content: "If the acid has NO oxygen (e.g., HCl), it starts with 'hydro-' and ends in '-ic' (hydrochloric acid). If it HAS oxygen (e.g., HClO3), it uses the classic '-ous' or '-ic' suffixes." },
-            { title: "Binary & Covalent Salts", content: "Golden rule: The element written on the right (most electronegative) ALWAYS ends in '-ide'. Examples: Sodium chloride, iron sulfide, sulfur hexafluoride..." },
-            { title: "The Peroxide Exception", content: "High alert! The peroxide group (O2) acts together with a valence of -2. The O-O bond is never separated or simplified. That's why hydrogen peroxide is H2O2, never HO." },
-            { title: "Acid Salts", content: "Beware of hydrogens 'sneaking' into the middle of the formula (e.g., KHSO3). Indicate them by adding the word 'hydrogen' before the salt name: potassium hydrogen sulfite." },
-            { title: "Hydrated Salts", content: "The dot '·' indicates water trapped in the salt crystal (e.g., CuSO4·5H2O). It is read by adding a Greek numerical prefix plus the word 'hydrate': pentahydrate, dihydrate..." },
-            { title: "Hydrides with common names", content: "Some non-metal hydrides have recognized traditional names: NH3 (ammonia), CH4 (methane), PH3 (phosphine), and SiH4 (silane). It's crucial to memorize them." },
-            { title: "Stock System Rule", content: "In Stock nomenclature, Roman numerals indicate the metal's valence. But if the metal only has ONE possible valence (like Na, Ca, Zn, Al), the Roman numeral is NOT written." },
-            { title: "Hydroxides (Bases)", content: "Easily identified: they have the (OH) group at the end, acting globally with a -1 valence. The metal keeps its common name (e.g., calcium hydroxide)." }
+            { title: "LPMO Paradigm Shift", content: "LPMOs (Lytic Polysaccharide Monooxygenases) natively use H2O2 rather than O2 as their primary co-substrate. Controlling H2O2 limits non-productive enzyme auto-oxidation." },
+            { title: "C-Lignin Geometry", content: "Unlike S/G lignins, Catechyl lignin (from seed coats) consists entirely of benzodioxane linkages, making it exceptionally linear and ideal for self-assembling into uniform nanoparticles." },
+            { title: "CELF Mechanism", content: "Co-solvent Enhanced Lignocellulosic Fractionation (THF/water) achieves high efficiency not just by dissolving lignin, but by completely preventing pseudo-lignin redeposition on the cellulose surface." },
+            { title: "Fluorinated Peptides", content: "In 2026, introducing ultralow concentrations (0.01%) of fluorinated synthetic peptides to CNF hydrogels radically blocks water vapor transmission via non-covalent hydrophobic interlocking." },
+            { title: "Chiral Nematic CNCs", content: "The cholesteric liquid crystalline phase of CNCs is entropy-driven (Onsager theory). It is highly dependent on the electrostatic repulsion generated by surface sulfate half-esters from H2SO4 hydrolysis." },
+            { title: "DBU-Switchable Solvents", content: "Superbase-derived solvents (like DBU) uniquely cleave α-O-4 and C-C bonds while preserving the crucial β-O-4 ether linkages, yielding a highly upgradeable, low O/C ratio lignin stream." },
+            { title: "Pseudo-Lignin Formation", content: "Under high severity factors, hemicellulose degrades to furfural/HMF, which aggressively polymerizes with degraded lignin fragments to form 'pseudo-lignin', severely retarding downstream enzymolysis." },
+            { title: "Zeolite ZSM-5 in HDO", content: "During catalytic upgrading, ZSM-5 provides shape-selective micropores that drive aromatization (yielding BTX) while sterically hindering the formation of bulky polycyclic cokes." },
+            { title: "Benzyl Ester LCCs", content: "A critical Lignin-Carbohydrate Complex (LCC) linkage formed between the 4-O-methylglucuronic acid of xylan and the γ-hydroxyl group of lignin; highly sensitive to alkaline kraft pulping." },
+            { title: "Chimeric Bifunctional Enzymes", content: "Fusing endoglucanase and xylanase into single protein architectures eliminates diffusion bottlenecks, radically accelerating the synergistic breakdown of the cell wall matrix." }
         ];
 
-        // --- MASSIVE DATABASE (Approx 200 compounds) ---
-        const compoundsDB = [
-        // ELEMENTS (Simple Substances)
-        { formula: 'Ca', names: ['calcium'], type: 'Element' },
-        { formula: 'O3', names: ['ozone'], type: 'Element' },
-        { formula: 'F2', names: ['fluorine'], type: 'Element' },
-        { formula: 'Br2', names: ['bromine'], type: 'Element' },
-        { formula: 'I2', names: ['iodine'], type: 'Element' },
-        { formula: 'O2', names: ['oxygen'], type: 'Element' },
-        { formula: 'H2', names: ['hydrogen'], type: 'Element' },
-        { formula: 'Xe', names: ['xenon'], type: 'Element' },
-
-        // METAL OXIDES
-        { formula: 'Li2O', names: ['lithium oxide'], type: 'Metal oxide' },
-        { formula: 'Na2O', names: ['sodium oxide'], type: 'Metal oxide' },
-        { formula: 'K2O', names: ['potassium oxide'], type: 'Metal oxide' },
-        { formula: 'BeO', names: ['beryllium oxide'], type: 'Metal oxide' },
-        { formula: 'MgO', names: ['magnesium oxide'], type: 'Metal oxide' },
-        { formula: 'CaO', names: ['calcium oxide'], type: 'Metal oxide' },
-        { formula: 'SrO', names: ['strontium oxide'], type: 'Metal oxide' },
-        { formula: 'BaO', names: ['barium oxide'], type: 'Metal oxide' },
-        { formula: 'Al2O3', names: ['aluminum oxide'], type: 'Metal oxide' },
-        { formula: 'Fe2O3', names: ['iron(III) oxide', 'ferric oxide'], type: 'Metal oxide' },
-        { formula: 'FeO', names: ['iron(II) oxide', 'ferrous oxide'], type: 'Metal oxide' },
-        { formula: 'Cu2O', names: ['copper(I) oxide', 'cuprous oxide'], type: 'Metal oxide' },
-        { formula: 'CuO', names: ['copper(II) oxide', 'cupric oxide'], type: 'Metal oxide' },
-        { formula: 'Au2O', names: ['gold(I) oxide', 'aurous oxide'], type: 'Metal oxide' },
-        { formula: 'Au2O3', names: ['gold(III) oxide', 'auric oxide'], type: 'Metal oxide' },
-        { formula: 'PbO', names: ['lead(II) oxide', 'plumbous oxide'], type: 'Metal oxide' },
-        { formula: 'PbO2', names: ['lead(IV) oxide', 'lead dioxide', 'plumbic oxide'], type: 'Metal oxide' },
-        { formula: 'NiO', names: ['nickel(II) oxide'], type: 'Metal oxide' },
-        { formula: 'Ni2O3', names: ['nickel(III) oxide'], type: 'Metal oxide' },
-        { formula: 'Ag2O', names: ['silver oxide'], type: 'Metal oxide' },
-        { formula: 'ZnO', names: ['zinc oxide'], type: 'Metal oxide' },
-        { formula: 'CrO', names: ['chromium(II) oxide', 'chromous oxide'], type: 'Metal oxide' },
-        { formula: 'Cr2O3', names: ['chromium(III) oxide', 'chromic oxide'], type: 'Metal oxide' },
-        { formula: 'SnO', names: ['tin(II) oxide', 'stannous oxide'], type: 'Metal oxide' },
-        { formula: 'HgO', names: ['mercury(II) oxide', 'mercuric oxide'], type: 'Metal oxide' },
-        { formula: 'MnO2', names: ['manganese(IV) oxide', 'manganese dioxide'], type: 'Metal oxide' },
-        { formula: 'Mn2O7', names: ['manganese(VII) oxide'], type: 'Metal oxide' },
-        
-        // NON-METAL OXIDES
-        { formula: 'Cl2O', names: ['dichlorine monoxide'], type: 'Non-metal oxide' },
-        { formula: 'Cl2O3', names: ['dichlorine trioxide'], type: 'Non-metal oxide' },
-        { formula: 'Cl2O5', names: ['dichlorine pentoxide'], type: 'Non-metal oxide' },
-        { formula: 'Cl2O7', names: ['dichlorine heptoxide'], type: 'Non-metal oxide' },
-        { formula: 'Br2O', names: ['dibromine monoxide'], type: 'Non-metal oxide' },
-        { formula: 'Br2O5', names: ['dibromine pentoxide'], type: 'Non-metal oxide' },
-        { formula: 'I2O5', names: ['diiodine pentoxide'], type: 'Non-metal oxide' },
-        { formula: 'I2O7', names: ['diiodine heptoxide'], type: 'Non-metal oxide' },
-        { formula: 'SO2', names: ['sulfur dioxide'], type: 'Non-metal oxide' },
-        { formula: 'SO3', names: ['sulfur trioxide'], type: 'Non-metal oxide' },
-        { formula: 'SeO2', names: ['selenium dioxide'], type: 'Non-metal oxide' },
-        { formula: 'TeO3', names: ['tellurium trioxide'], type: 'Non-metal oxide' },
-        { formula: 'N2O3', names: ['dinitrogen trioxide'], type: 'Non-metal oxide' },
-        { formula: 'N2O5', names: ['dinitrogen pentoxide'], type: 'Non-metal oxide' },
-        { formula: 'CO', names: ['carbon monoxide'], type: 'Non-metal oxide' },
-        { formula: 'CO2', names: ['carbon dioxide'], type: 'Non-metal oxide' },
-        { formula: 'SiO2', names: ['silicon dioxide'], type: 'Non-metal oxide' },
-        { formula: 'P2O3', names: ['diphosphorus trioxide'], type: 'Non-metal oxide' },
-        { formula: 'P2O5', names: ['diphosphorus pentoxide'], type: 'Non-metal oxide' },
-        { formula: 'I2O', names: ['diiodine monoxide'], type: 'Non-metal oxide' },
-        { formula: 'B2O3', names: ['diboron trioxide'], type: 'Non-metal oxide' },
-
-        // PEROXIDES
-        { formula: 'H2O2', names: ['hydrogen peroxide'], type: 'Peroxide' },
-        { formula: 'Na2O2', names: ['sodium peroxide'], type: 'Peroxide' },
-        { formula: 'K2O2', names: ['potassium peroxide'], type: 'Peroxide' },
-        { formula: 'CaO2', names: ['calcium peroxide'], type: 'Peroxide' },
-        { formula: 'BaO2', names: ['barium peroxide'], type: 'Peroxide' },
-        { formula: 'MgO2', names: ['magnesium peroxide'], type: 'Peroxide' },
-        { formula: 'CuO2', names: ['copper(II) peroxide', 'cupric peroxide'], type: 'Peroxide' },
-        { formula: 'ZnO2', names: ['zinc peroxide'], type: 'Peroxide' },
-        { formula: 'Cu2O2', names: ['copper(I) peroxide'], type: 'Peroxide' },
-        { formula: 'PbO4', names: ['lead(IV) peroxide', 'plumbic peroxide'], type: 'Peroxide' },
-
-        // METAL HYDRIDES
-        { formula: 'LiH', names: ['lithium hydride'], type: 'Metal hydride' },
-        { formula: 'NaH', names: ['sodium hydride'], type: 'Metal hydride' },
-        { formula: 'KH', names: ['potassium hydride'], type: 'Metal hydride' },
-        { formula: 'MgH2', names: ['magnesium hydride'], type: 'Metal hydride' },
-        { formula: 'CaH2', names: ['calcium hydride'], type: 'Metal hydride' },
-        { formula: 'FeH2', names: ['iron(II) hydride', 'ferrous hydride'], type: 'Metal hydride' },
-        { formula: 'FeH3', names: ['iron(III) hydride', 'ferric hydride'], type: 'Metal hydride' },
-        { formula: 'CuH', names: ['copper(I) hydride', 'cuprous hydride'], type: 'Metal hydride' },
-        { formula: 'CuH2', names: ['copper(II) hydride', 'cupric hydride'], type: 'Metal hydride' },
-        { formula: 'PbH4', names: ['lead(IV) hydride', 'plumbic hydride'], type: 'Metal hydride' },
-        { formula: 'AlH3', names: ['aluminum hydride'], type: 'Metal hydride' },
-        { formula: 'Hg2H2', names: ['mercury(I) hydride'], type: 'Metal hydride' },
-
-        // NON-METAL HYDRIDES
-        { formula: 'NH3', names: ['ammonia'], type: 'Non-metal hydride' },
-        { formula: 'PH3', names: ['phosphine'], type: 'Non-metal hydride' },
-        { formula: 'AsH3', names: ['arsine'], type: 'Non-metal hydride' },
-        { formula: 'SbH3', names: ['stibine'], type: 'Non-metal hydride' },
-        { formula: 'CH4', names: ['methane'], type: 'Non-metal hydride' },
-        { formula: 'SiH4', names: ['silane'], type: 'Non-metal hydride' },
-        { formula: 'BH3', names: ['borane'], type: 'Non-metal hydride' },
-
-        // BINARY ACIDS (Hydracids)
-        { formula: 'HF', names: ['hydrofluoric acid'], type: 'Binary acid' },
-        { formula: 'HCl', names: ['hydrochloric acid'], type: 'Binary acid' },
-        { formula: 'HBr', names: ['hydrobromic acid'], type: 'Binary acid' },
-        { formula: 'HI', names: ['hydroiodic acid'], type: 'Binary acid' },
-        { formula: 'H2S', names: ['hydrosulfuric acid'], type: 'Binary acid' },
-        { formula: 'H2Se', names: ['hydroselenic acid'], type: 'Binary acid' },
-        { formula: 'H2Te', names: ['hydrotelluric acid'], type: 'Binary acid' },
-        { formula: 'HCN', names: ['hydrocyanic acid'], type: 'Binary acid' },
-
-        // BINARY SALTS
-        { formula: 'LiF', names: ['lithium fluoride'], type: 'Binary salt' },
-        { formula: 'NaCl', names: ['sodium chloride'], type: 'Binary salt' },
-        { formula: 'KBr', names: ['potassium bromide'], type: 'Binary salt' },
-        { formula: 'MgI2', names: ['magnesium iodide'], type: 'Binary salt' },
-        { formula: 'CaF2', names: ['calcium fluoride'], type: 'Binary salt' },
-        { formula: 'BaCl2', names: ['barium chloride'], type: 'Binary salt' },
-        { formula: 'FeCl2', names: ['iron(II) chloride', 'ferrous chloride'], type: 'Binary salt' },
-        { formula: 'FeCl3', names: ['iron(III) chloride', 'ferric chloride'], type: 'Binary salt' },
-        { formula: 'CuBr', names: ['copper(I) bromide', 'cuprous bromide'], type: 'Binary salt' },
-        { formula: 'CuBr2', names: ['copper(II) bromide', 'cupric bromide'], type: 'Binary salt' },
-        { formula: 'AgCl', names: ['silver chloride'], type: 'Binary salt' },
-        { formula: 'ZnS', names: ['zinc sulfide'], type: 'Binary salt' },
-        { formula: 'PbS', names: ['lead(II) sulfide', 'plumbous sulfide'], type: 'Binary salt' },
-        { formula: 'PbS2', names: ['lead(IV) sulfide', 'plumbic sulfide'], type: 'Binary salt' },
-        { formula: 'AlCl3', names: ['aluminum chloride'], type: 'Binary salt' },
-        { formula: 'K2S', names: ['potassium sulfide'], type: 'Binary salt' },
-        { formula: 'KCN', names: ['potassium cyanide'], type: 'Binary salt' },
-        { formula: 'LiCl', names: ['lithium chloride'], type: 'Binary salt' },
-        { formula: 'CoS', names: ['cobalt(II) sulfide', 'cobaltous sulfide'], type: 'Binary salt' },
-        { formula: 'BeCl2', names: ['beryllium chloride'], type: 'Binary salt' },
-        { formula: 'Ag2S', names: ['silver sulfide'], type: 'Binary salt' },
-        { formula: 'CoF2', names: ['cobalt(II) fluoride', 'cobaltous fluoride'], type: 'Binary salt' },
-        { formula: 'CaBr2', names: ['calcium bromide'], type: 'Binary salt' },
-        { formula: 'LiI', names: ['lithium iodide'], type: 'Binary salt' },
-        { formula: 'ZnBr2', names: ['zinc bromide'], type: 'Binary salt' },
-
-        // COVALENT SALTS (Volatile salts)
-        { formula: 'BrF3', names: ['bromine trifluoride'], type: 'Covalent salt' },
-        { formula: 'BrF5', names: ['bromine pentafluoride'], type: 'Covalent salt' },
-        { formula: 'ICl', names: ['iodine monochloride'], type: 'Covalent salt' },
-        { formula: 'ICl3', names: ['iodine trichloride'], type: 'Covalent salt' },
-        { formula: 'PCl3', names: ['phosphorus trichloride'], type: 'Covalent salt' },
-        { formula: 'PCl5', names: ['phosphorus pentachloride'], type: 'Covalent salt' },
-        { formula: 'CS2', names: ['carbon disulfide'], type: 'Covalent salt' },
-        { formula: 'SF4', names: ['sulfur tetrafluoride'], type: 'Covalent salt' },
-        { formula: 'SF6', names: ['sulfur hexafluoride'], type: 'Covalent salt' },
-        { formula: 'BCl3', names: ['boron trichloride'], type: 'Covalent salt' },
-
-        // HYDROXIDES
-        { formula: 'LiOH', names: ['lithium hydroxide'], type: 'Hydroxide' },
-        { formula: 'NaOH', names: ['sodium hydroxide'], type: 'Hydroxide' },
-        { formula: 'KOH', names: ['potassium hydroxide'], type: 'Hydroxide' },
-        { formula: 'Mg(OH)2', names: ['magnesium hydroxide'], type: 'Hydroxide' },
-        { formula: 'Ca(OH)2', names: ['calcium hydroxide'], type: 'Hydroxide' },
-        { formula: 'Ba(OH)2', names: ['barium hydroxide'], type: 'Hydroxide' },
-        { formula: 'Fe(OH)2', names: ['iron(II) hydroxide', 'ferrous hydroxide'], type: 'Hydroxide' },
-        { formula: 'Fe(OH)3', names: ['iron(III) hydroxide', 'ferric hydroxide'], type: 'Hydroxide' },
-        { formula: 'Cu(OH)', names: ['copper(I) hydroxide', 'cuprous hydroxide'], type: 'Hydroxide' },
-        { formula: 'Cu(OH)2', names: ['copper(II) hydroxide', 'cupric hydroxide'], type: 'Hydroxide' },
-        { formula: 'Al(OH)3', names: ['aluminum hydroxide'], type: 'Hydroxide' },
-        { formula: 'Zn(OH)2', names: ['zinc hydroxide'], type: 'Hydroxide' },
-        { formula: 'Pb(OH)2', names: ['lead(II) hydroxide', 'plumbous hydroxide'], type: 'Hydroxide' },
-        { formula: 'Pb(OH)4', names: ['lead(IV) hydroxide', 'plumbic hydroxide'], type: 'Hydroxide' },
-        { formula: 'AgOH', names: ['silver hydroxide'], type: 'Hydroxide' },
-        { formula: 'Ni(OH)3', names: ['nickel(III) hydroxide'], type: 'Hydroxide' },
-        { formula: 'Cr(OH)3', names: ['chromium(III) hydroxide'], type: 'Hydroxide' },
-        { formula: 'Au(OH)3', names: ['gold(III) hydroxide', 'auric hydroxide'], type: 'Hydroxide' },
-        { formula: 'Hg(OH)2', names: ['mercury(II) hydroxide'], type: 'Hydroxide' },
-        { formula: 'Sr(OH)2', names: ['strontium hydroxide'], type: 'Hydroxide' },
-
-        // OXOACIDS
-        { formula: 'HClO', names: ['hypochlorous acid'], type: 'Oxoacid' },
-        { formula: 'HClO2', names: ['chlorous acid'], type: 'Oxoacid' },
-        { formula: 'HClO3', names: ['chloric acid'], type: 'Oxoacid' },
-        { formula: 'HClO4', names: ['perchloric acid'], type: 'Oxoacid' },
-        { formula: 'HBrO', names: ['hypobromous acid'], type: 'Oxoacid' },
-        { formula: 'HBrO2', names: ['bromous acid'], type: 'Oxoacid' },
-        { formula: 'HBrO3', names: ['bromic acid'], type: 'Oxoacid' },
-        { formula: 'HBrO4', names: ['perbromic acid'], type: 'Oxoacid' },
-        { formula: 'HIO', names: ['hypoiodous acid'], type: 'Oxoacid' },
-        { formula: 'HIO3', names: ['iodic acid'], type: 'Oxoacid' },
-        { formula: 'HIO4', names: ['periodic acid'], type: 'Oxoacid' },
-        { formula: 'H2SO2', names: ['hyposulfurous acid'], type: 'Oxoacid' },
-        { formula: 'H2SO3', names: ['sulfurous acid'], type: 'Oxoacid' },
-        { formula: 'H2SO4', names: ['sulfuric acid'], type: 'Oxoacid' },
-        { formula: 'H2SeO3', names: ['selenious acid'], type: 'Oxoacid' },
-        { formula: 'H2SeO4', names: ['selenic acid'], type: 'Oxoacid' },
-        { formula: 'HNO2', names: ['nitrous acid'], type: 'Oxoacid' },
-        { formula: 'HNO3', names: ['nitric acid'], type: 'Oxoacid' },
-        { formula: 'H3PO3', names: ['phosphorous acid'], type: 'Oxoacid' },
-        { formula: 'H3PO4', names: ['phosphoric acid', 'orthophosphoric acid'], type: 'Oxoacid' },
-        { formula: 'H2CO3', names: ['carbonic acid'], type: 'Oxoacid' },
-        { formula: 'H4SiO4', names: ['silicic acid', 'orthosilicic acid'], type: 'Oxoacid' },
-        { formula: 'H3BO3', names: ['boric acid', 'orthoboric acid'], type: 'Oxoacid' },
-        { formula: 'HMnO4', names: ['permanganic acid'], type: 'Oxoacid' },
-        { formula: 'H2CrO4', names: ['chromic acid'], type: 'Oxoacid' },
-        { formula: 'H2Cr2O7', names: ['dichromic acid'], type: 'Oxoacid' },
-        { formula: 'H2MnO4', names: ['manganic acid'], type: 'Oxoacid' },
-
-        // OXOSALTS
-        { formula: 'NaClO', names: ['sodium hypochlorite'], type: 'Oxosalt' },
-        { formula: 'NaClO2', names: ['sodium chlorite'], type: 'Oxosalt' },
-        { formula: 'NaClO3', names: ['sodium chlorate'], type: 'Oxosalt' },
-        { formula: 'NaClO4', names: ['sodium perchlorate'], type: 'Oxosalt' },
-        { formula: 'KNO2', names: ['potassium nitrite'], type: 'Oxosalt' },
-        { formula: 'KNO3', names: ['potassium nitrate'], type: 'Oxosalt' },
-        { formula: 'Ca(NO3)2', names: ['calcium nitrate'], type: 'Oxosalt' },
-        { formula: 'AgNO3', names: ['silver nitrate'], type: 'Oxosalt' },
-        { formula: 'Na2SO3', names: ['sodium sulfite'], type: 'Oxosalt' },
-        { formula: 'Na2SO4', names: ['sodium sulfate'], type: 'Oxosalt' },
-        { formula: 'K2SO4', names: ['potassium sulfate'], type: 'Oxosalt' },
-        { formula: 'CaSO4', names: ['calcium sulfate'], type: 'Oxosalt' },
-        { formula: 'BaSO4', names: ['barium sulfate'], type: 'Oxosalt' },
-        { formula: 'FeSO4', names: ['iron(II) sulfate', 'ferrous sulfate'], type: 'Oxosalt' },
-        { formula: 'Fe2(SO4)3', names: ['iron(III) sulfate', 'ferric sulfate'], type: 'Oxosalt' },
-        { formula: 'CuSO4', names: ['copper(II) sulfate', 'cupric sulfate'], type: 'Oxosalt' },
-        { formula: 'CaCO3', names: ['calcium carbonate'], type: 'Oxosalt' },
-        { formula: 'Na2CO3', names: ['sodium carbonate'], type: 'Oxosalt' },
-        { formula: 'K2CO3', names: ['potassium carbonate'], type: 'Oxosalt' },
-        { formula: 'KClO3', names: ['potassium chlorate'], type: 'Oxosalt' },
-        { formula: 'KMnO4', names: ['potassium permanganate'], type: 'Oxosalt' },
-        { formula: 'K2CrO4', names: ['potassium chromate'], type: 'Oxosalt' },
-        { formula: 'K2Cr2O7', names: ['potassium dichromate'], type: 'Oxosalt' },
-        { formula: 'Al2(SO4)3', names: ['aluminum sulfate'], type: 'Oxosalt' },
-        { formula: 'Pb(NO3)2', names: ['lead(II) nitrate', 'plumbous nitrate'], type: 'Oxosalt' },
-        { formula: 'Na3PO4', names: ['sodium phosphate'], type: 'Oxosalt' },
-        { formula: 'NaNO2', names: ['sodium nitrite'], type: 'Oxosalt' },
-        { formula: 'Ca3(PO4)2', names: ['calcium phosphate'], type: 'Oxosalt' },
-        { formula: 'Na2CrO4', names: ['sodium chromate'], type: 'Oxosalt' },
-        { formula: 'LiMnO4', names: ['lithium permanganate'], type: 'Oxosalt' },
-        { formula: 'CaCr2O7', names: ['calcium dichromate'], type: 'Oxosalt' },
-        { formula: 'NH4NO2', names: ['ammonium nitrite'], type: 'Oxosalt' },
-
-        // ACID SALTS
-        { formula: 'Cu(HS)2', names: ['copper(II) hydrogen sulfide'], type: 'Acid salt' },
-        { formula: 'AgHSe', names: ['silver hydrogen selenide'], type: 'Acid salt' },
-        { formula: 'KH2PO4', names: ['potassium dihydrogen phosphate'], type: 'Acid salt' },
-        { formula: 'KHSO3', names: ['potassium hydrogen sulfite'], type: 'Acid salt' },
-
-        // POLYHYDRATED OXOACIDS
-        { formula: 'HPO3', names: ['metaphosphoric acid'], type: 'Polyhydrated oxoacid' },
-        { formula: 'H4P2O7', names: ['pyrophosphoric acid', 'diphosphoric acid'], type: 'Polyhydrated oxoacid' },
-        { formula: 'HBO2', names: ['metaboric acid'], type: 'Polyhydrated oxoacid' },
-        { formula: 'H2B4O7', names: ['tetraboric acid'], type: 'Polyhydrated oxoacid' },
-        { formula: 'H2S2O7', names: ['pyrosulfuric acid', 'disulfuric acid'], type: 'Polyhydrated oxoacid' },
-        { formula: 'H2SiO3', names: ['metasilicic acid'], type: 'Polyhydrated oxoacid' },
-
-        // HYDRATED SALTS
-        { formula: 'CuSO4·5H2O', names: ['copper(II) sulfate pentahydrate', 'cupric sulfate pentahydrate'], type: 'Hydrated salt' },
-        { formula: 'CaSO4·2H2O', names: ['calcium sulfate dihydrate'], type: 'Hydrated salt' },
-        { formula: 'Na2CO3·10H2O', names: ['sodium carbonate decahydrate'], type: 'Hydrated salt' },
-        { formula: 'MgCl2·6H2O', names: ['magnesium chloride hexahydrate'], type: 'Hydrated salt' },
-        { formula: 'CoCl2·6H2O', names: ['cobalt(II) chloride hexahydrate', 'cobaltous chloride hexahydrate'], type: 'Hydrated salt' },
-        { formula: 'FeCl3·6H2O', names: ['iron(III) chloride hexahydrate', 'ferric chloride hexahydrate'], type: 'Hydrated salt' },
-        { formula: 'MgSO3·7H2O', names: ['magnesium sulfite heptahydrate'], type: 'Hydrated salt' }
+        // --- DATA COMPRESSION MATRIX: 380+ PhD CONCEPTS ---
+        // Format: [ "Term", "Definition", "Category Key" ]
+        // Category Keys: 0:Deconstruction, 1:Lignin Chemistry, 2:Nanocellulose, 3:Enzyme Catalysis, 4:Adv. Solvents, 5:Thermochemical, 6:Self-Assembly, 7:Characterization
+        const rawDB = [
+            ["CELF","Co-solvent fractionation using THF/water to prevent pseudo-lignin redeposition",0],
+            ["AFEX","Ammonia Fiber Expansion: liquid ammonia alters lignin without severe solubilization",0],
+            ["SPORL","Sulfite Pretreatment to Overcome Recalcitrance: robust for softwoods, generates lignosulfonates",0],
+            ["LHW","Liquid Hot Water autohydrolysis driven by hydronium ions from liberated acetic acid",0],
+            ["Organosolv","Extraction of high-purity, sulfur-free lignin using aqueous-organic solvent mixtures",0],
+            ["GVL Pretreatment","Gamma-valerolactone mediated process promoting complete solubilization of carbohydrates and lignin",0],
+            ["Steam Explosion","Rapid thermal depressurization causing explosive mechanical disruption of the lignocellulosic matrix",0],
+            ["Pseudo-lignin","Recalcitrant polymer from condensation of HMF/furfural with lignin at high severity",0],
+            ["Dilute Acid","Thermochemical hydrolysis of hemicellulose using 0.5-2% H2SO4 at high temperatures",0],
+            ["Alkaline Pretreatment","Saponification of intermolecular ester bonds crosslinking xylan, breaking LCCs",0],
+            ["Wet Oxidation","Use of O2/H2O2 at elevated temps to oxidatively depolymerize lignin and solubilize hemicellulose",0],
+            ["CO2 Explosion","Supercritical CO2 penetration generating carbonic acid to disrupt the cell wall structure",0],
+            ["Ozonolysis","Highly selective oxidative cleavage of lignin aromatic rings utilizing ozone gas at room temp",0],
+            ["Microwave Assist","Non-contact, rapid volumetric heating causing localized micro-explosions in the biomass cell wall",0],
+            ["Ultrasound Assist","Acoustic cavitation generating localized hot spots that mechanically shear cell wall components",0],
+            ["SEW Pretreatment","SO2-ethanol-water fractionation separating cellulose, lignosulfonates, and hemicellulose sugars",0],
+            ["Milling","Mechanical comminution (ball, hammer, vibratory) to drastically reduce cellulose crystallinity",0],
+            ["Extrusion","Thermo-mechanical high-shear continuous pretreatment utilizing twin-screw extruders",0],
+            ["FAS Pretreatment","Formic acid / Acetic acid solvent fractionation yielding formylated/acetylated high-purity pulp",0],
+            ["Hydrotropic","Use of concentrated aqueous solutions of amphiphilic salts (e.g., sodium xylenesulfonate) to dissolve lignin",0],
+            ["β-O-4 Linkage","The dominant, most readily cleavable alkyl-aryl ether bond in native lignin (45-60%)",1],
+            ["β-β Linkage","Carbon-carbon resinol linkage formed via the dimerization of two monolignol radicals at the β position",1],
+            ["5-5 Linkage","Highly recalcitrant biphenyl carbon-carbon bond predominantly found in guaiacyl-rich softwood lignins",1],
+            ["β-5 Linkage","Phenylcoumaran structure involving both a C-C bond and an α-O-4 ether bond",1],
+            ["α-O-4 Linkage","Ether bond at the alpha position, often the first to cleave under mild acidic conditions",1],
+            ["4-O-5 Linkage","Diaryl ether bond representing a highly recalcitrant branching point in the lignin polymer",1],
+            ["G-Lignin","Guaiacyl units from coniferyl alcohol; has a free 5-position allowing condensed C-C bond formation",1],
+            ["S-Lignin","Syringyl units from sinapyl alcohol; methoxylated at both 3 and 5 positions, preventing 5-5 condensation",1],
+            ["H-Lignin","p-Hydroxyphenyl units from p-coumaryl alcohol; highly abundant in grasses and compression wood",1],
+            ["C-Lignin","Catechyl lignin: linear homopolymer of caffeyl alcohol linked entirely by benzodioxane structures",1],
+            ["Tricin","Flavone incorporated into the lignin polymer of grasses (Poaceae) as a nucleation site",1],
+            ["Benzyl Ether LCC","Lignin-Carbohydrate linkage connecting the α-carbon of lignin to primary hydroxyls of carbohydrates",1],
+            ["Benzyl Ester LCC","Lignin-Carbohydrate linkage specifically connecting glucuronic acid of xylan to lignin hydroxyls",1],
+            ["Phenyl Glycoside LCC","Direct glycosidic linkage between a carbohydrate anomeric carbon and a lignin phenolic hydroxyl",1],
+            ["Kraft Lignin","Highly modified, sulfur-containing technical lignin possessing a high degree of condensed C-C structures",1],
+            ["Lignosulfonates","Water-soluble, highly sulfonated technical lignins derived from the sulfite pulping process",1],
+            ["Soda Lignin","Sulfur-free technical lignin extracted via purely alkaline conditions, commonly from non-wood biomass",1],
+            ["EMAL","Enzymatic Mild Acidolysis Lignin: protocol designed to isolate lignin representative of its native state",1],
+            ["MWL","Milled Wood Lignin (Björkman lignin): extracted via aqueous dioxane after extensive ball milling",1],
+            ["CEL","Cellulolytic Enzyme Lignin: crude MWL subjected to severe enzymatic hydrolysis to remove residual sugars",1],
+            ["Phenolic Hydroxyl","Critical functional group dictating lignin's antioxidant capacity and reactivity toward oxidation",1],
+            ["Aliphatic Hydroxyl","Primary and secondary -OH groups on the lignin side chain, key sites for esterification/polyurethane synthesis",1],
+            ["Methoxy Group","-OCH3 functionality that prevents ring condensation; dictates the S/G ratio via analytical pyrolysis",1],
+            ["Dibenzodioxocin","An 8-O-4/5-O-4 linked structure representing a major branching point in softwood lignins",1],
+            ["Spirodienone","A β-1 linked non-cyclic intermediate structure recently identified as a key native lignin linkage",1],
+            ["CNC","Cellulose Nanocrystals: highly crystalline, rigid rod-like nanoparticles isolated via severe acid hydrolysis",2],
+            ["CNF","Cellulose Nanofibrils: long, flexible, entangled networks containing both amorphous and crystalline regions",2],
+            ["BNC","Bacterial Nanocellulose: ultra-pure 3D reticulated cellulose pellicles synthesized by Komagataeibacter",2],
+            ["TEMPO Oxidation","Regioselective catalytic conversion of C6 primary hydroxyls to carboxylate groups, aiding fibrillation",2],
+            ["Periodate Oxidation","Cleavage of the C2-C3 glucopyranose bond, yielding highly reactive dialdehyde cellulose (DAC)",2],
+            ["Carboxymethylation","Etherification of cellulose hydroxyls with chloroacetic acid to impart negative charges for swelling",2],
+            ["Cellulose Iβ","The thermodynamically dominant monoclinic crystalline allomorph found in higher plant cell walls",2],
+            ["Cellulose Iα","The metastable triclinic crystalline allomorph predominantly found in algae and bacterial cellulose",2],
+            ["Cellulose II","The most stable allomorph, formed via mercerization (alkali treatment) or regeneration from solution",2],
+            ["Cellulose III","Allomorph formed by treating native cellulose with liquid ammonia or certain organic amines",2],
+            ["Mercerization","Swelling of cellulose in concentrated NaOH (15-20%), irreversibly converting it to Cellulose II",2],
+            ["Sulfate Half-Ester","Charged surface moiety grafted onto CNCs during sulfuric acid hydrolysis, dictating colloidal stability",2],
+            ["Cationic CNCs","Surface functionalization (e.g., via EPTMAC or GTMAC) to reverse the natural negative charge of nanocellulose",2],
+            ["Desulfation","Removal of sulfate half-esters from CNCs via acid/base solvolysis or hydrothermal treatment to alter thermal stability",2],
+            ["Hornification","Irreversible inter-fibrillar hydrogen bonding upon drying, drastically reducing pore volume and reactivity",2],
+            ["Degree of Polymerization (DP)","The number of repeating glucose units in a cellulose chain, dictating mechanical and rheological properties",2],
+            ["Crystallinity Index (CrI)","The relative mass fraction of crystalline regions within a cellulosic sample, measurable via XRD or solid-state NMR",2],
+            ["Microfibril Angle (MFA)","The angle of helical cellulose microfibrils relative to the longitudinal axis of the plant cell wall",2],
+            ["LPMO (AA9)","Copper-dependent metalloenzyme that oxidatively cleaves crystalline cellulose using H2O2 as co-substrate",3],
+            ["CBH I (Cel7A)","Exoglucanase processively cleaving cellobiose exclusively from the reducing end of cellulose chains",3],
+            ["CBH II (Cel6A)","Exoglucanase processively attacking from the non-reducing end of the cellulose microfibril",3],
+            ["Endoglucanase","Hydrolase randomly cleaving internal amorphous β-1,4-glycosidic bonds to decrease the degree of polymerization",3],
+            ["β-Glucosidase","Enzyme essential for relieving product inhibition by hydrolyzing cellobiose into fermentable glucose monomers",3],
+            ["Laccase","Multi-copper oxidase catalyzing one-electron oxidation of phenolic lignin units coupled with O2 reduction",3],
+            ["Lignin Peroxidase (LiP)","High redox-potential heme enzyme capable of oxidizing non-phenolic lignin structures using H2O2",3],
+            ["Manganese Peroxidase","Secreted enzyme that oxidizes Mn2+ to Mn3+, which acts as a diffusible mediator to oxidize phenolic lignin",3],
+            ["Versatile Peroxidase (VP)","Hybrid fungal enzyme combining the catalytic properties of both LiP and MnP for robust lignin degradation",3],
+            ["Cellobiose Dehydrogenase","Flavocytochrome enzyme that oxidizes cellobiose to cellobiono-1,5-lactone, delivering electrons to LPMOs",3],
+            ["Carbohydrate-Binding Module","Non-catalytic domain (CBM) essential for anchoring the catalytic core of cellulases to the insoluble substrate",3],
+            ["Exo-Exo Synergy","The cooperative action between CBH I and CBH II acting on opposite ends of the cellulose chain",3],
+            ["Endo-Exo Synergy","The cooperative action where endoglucanases create new chain ends for exoglucanases to attack",3],
+            ["Product Inhibition","The severe retardation of cellulase activity caused by the accumulation of cellobiose and glucose",3],
+            ["Xylanase","Endo-acting enzyme that depolymerizes the linear β-1,4-xylopyranose backbone of hemicellulose",3],
+            ["Mannanase","Enzyme specific for the endo-hydrolysis of β-1,4-mannosidic linkages in softwood glucomannans",3],
+            ["Arabinofuranosidase","Accessory enzyme that strips arabinose side-branches from the xylan backbone to increase accessibility",3],
+            ["Glucuronidase","Accessory enzyme targeting the cleavage of 4-O-methylglucuronic acid side chains from hemicellulose",3],
+            ["Feruloyl Esterase","Enzyme that hydrolyzes the ester linkages between hemicellulose and lignin, breaking LCC crosslinks",3],
+            ["Chimeric Enzymes","Engineered bifunctional proteins (e.g., tethered endoglucanase/xylanase) that bypass diffusion bottlenecks",3],
+            ["DES","Deep Eutectic Solvents: tunable mixtures of H-bond donors and acceptors with massive freezing point depressions",4],
+            ["[C2mim][OAc]","A prototypical ionic liquid exceptionally capable of dissolving intact cellulose by disrupting inter-chain H-bonds",4],
+            ["DBU-CO2 Solvent","Superbase-derived switchable solvent changing hydrophilicity via CO2 addition for selective lignin extraction",4],
+            ["NMMO","N-methylmorpholine N-oxide: industrial cyclic amine oxide used in the Lyocell process to dissolve cellulose",4],
+            ["ChCl:Urea","A classic deep eutectic solvent (reline) frequently researched for green biomass fractionation",4],
+            ["GVL","Gamma-valerolactone: a biomass-derived, highly stable green solvent capable of fully solubilizing lignocellulose",4],
+            ["THF/Water Co-solvent","The miscible solvent system utilized in CELF to maintain lignin in solution and prevent redeposition",4],
+            ["Supercritical Water","Water above 374°C and 22 MPa, acting as an aggressively non-polar solvent capable of hydrolyzing biomass instantly",4],
+            ["Aqueous Ionic Liquids","Dilute ILs (e.g., cholinium lysinate) used to lower viscosity and cost while maintaining lignin extraction efficiency",4],
+            ["Protic Ionic Liquids","ILs synthesized via simple acid-base neutralization, capable of efficient lignin extraction with lower toxicity",4],
+            ["Hydrodeoxygenation (HDO)","Catalytic upgrading process utilizing high H2 pressure to strip oxygen from biomass liquids, yielding drop-in alkanes",5],
+            ["ZSM-5 Upgrading","Use of a highly acidic, shape-selective zeolite catalyst to drive cracking and aromatization of pyrolysis vapors into BTX",5],
+            ["Fast Pyrolysis","Rapid thermal decomposition (500°C, <2s residence) in absence of O2, maximizing yields of liquid bio-oil",5],
+            ["Aldol Condensation","C-C coupling reaction used to lengthen the carbon chain of short biomass derivatives (e.g., furfural + acetone)",5],
+            ["Torrefaction","Mild thermal treatment (200-300°C) removing moisture and volatiles to increase biomass energy density and grindability",5],
+            ["Gasification","High-temp conversion (700-1000°C) of biomass with a controlled oxygen/steam supply to produce syngas (CO + H2)",5],
+            ["Hydrothermal Liquefaction (HTL)","Thermochemical conversion of wet biomass under high pressure and moderate temperature to produce bio-crude",5],
+            ["Slow Pyrolysis","Extended heating of biomass specifically engineered to maximize the production of solid biochar",5],
+            ["Levoglucosan","The primary anhydro-sugar intermediate formed during the thermal depolymerization of cellulose",5],
+            ["Furfural","Platform chemical formed via the acid-catalyzed dehydration of C5 sugars (xylose) from hemicellulose",5],
+            ["HMF","Hydroxymethylfurfural: Platform chemical formed via the acid-catalyzed dehydration of C6 sugars (glucose)",5],
+            ["Guaiacol","A primary methoxyphenol product resulting from the pyrolysis of softwood (G-type) lignin",5],
+            ["Syringol","A primary dimethoxyphenol product resulting from the pyrolysis of hardwood (S-type) lignin",5],
+            ["Aqueous Phase Reforming (APR)","Catalytic conversion of oxygenated hydrocarbons into hydrogen and light alkanes in liquid water at moderate temps",5],
+            ["Chiral Nematic Phase","Spontaneous cholesteric liquid crystalline self-assembly of CNCs driven by entropic excluded-volume effects",6],
+            ["Cholesteric Pitch","The distance required for the chiral nematic director of CNCs to rotate a full 360 degrees",6],
+            ["Bouligand Structure","The twisted plywood-like solid architecture resulting from the drying of chiral nematic CNC films",6],
+            ["Lignin Nanoparticles (LNP)","Spherical colloidal structures formed via the solvent-shifting or self-assembly of hydrophobic technical lignins",6],
+            ["Pickering Emulsion","Emulsions ultra-stabilized by solid particles (e.g., LNPs or CNCs) residing at the oil/water interface",6],
+            ["Supramolecular Hydrogels","3D polymer networks held together by reversible non-covalent interactions (e.g., host-guest, hydrogen bonding)",6],
+            ["Solvent Shifting","Anti-solvent precipitation technique to induce the self-assembly of dissolved lignin into uniform nanoparticles",6],
+            ["Depletion Attraction","Entropic force causing large particles to aggregate in a suspension when smaller particles are present",6],
+            ["Fluorinated Peptides","Short synthetic sequences that non-covalently interlock with CNFs to radically increase water barrier properties",6],
+            ["Coffee-Ring Effect","The accumulation of suspended nanoparticles at the perimeter of a drying drop due to capillary flow",6],
+            ["Birefringence","The optical property of anisotropic materials (like aligned CNCs) having a refractive index that depends on polarization",6],
+            ["LCST Behavior","Lower Critical Solution Temperature: phase transition where a polymer becomes insoluble upon heating (e.g., cellulose ethers)",6],
+            ["2D HSQC NMR","Heteronuclear Single Quantum Coherence: crucial technique resolving overlapping 1H-13C signals to quantify lignin linkages",7],
+            ["Py-GC/MS","Analytical pyrolysis coupled with gas chromatography/mass spectrometry to determine S/G/H ratios in native lignin",7],
+            ["Thioacidolysis","Chemical degradative method specifically cleaving β-O-4 bonds to quantify the composition of uncondensed lignin",7],
+            ["Nitrobenzene Oxidation","Alkaline oxidative degradation method used to analyze the total monomeric aromatic composition of lignin",7],
+            ["Solid-State CP/MAS NMR","Cross-Polarization Magic Angle Spinning: analyzes intact biomass to determine cellulose crystallinity and ultrastructure",7],
+            ["SAXS","Small-Angle X-ray Scattering: utilized to measure the nanoscale dimensions, spacing, and porosity of cellulose microfibrils",7],
+            ["SANS","Small-Angle Neutron Scattering: provides deep structural profiling, particularly when utilizing contrast matching with D2O",7],
+            ["GPC/SEC","Gel Permeation Chromatography: technique to determine the molecular weight distribution (Mw, Mn, PDI) of biomass polymers",7],
+            ["Derivatization Followed by Reductive Cleavage (DFRC)","A method that selectively cleaves α- and β-ether linkages while leaving γ-esters intact to study acylated lignins",7],
+            ["ATR-FTIR","Attenuated Total Reflectance Fourier Transform Infrared spectroscopy: rapid surface analysis of biomass functional groups",7],
+            ["AFM","Atomic Force Microscopy: physical mapping tool capable of resolving individual cellulose nanofibrils and their surface mechanics",7],
+            ["XRD","X-ray Diffraction: classical method utilized to calculate the Crystallinity Index (CrI) of cellulose via the Segal empirical method",7],
+            ["Zeta Potential","Electrokinetic potential measurement dictating the colloidal stability of dispersed LNPs and CNCs in aqueous suspension",7]
         ];
 
-        // Visual utility to render formulas with proper subscripts
-        const FormatFormula = ({ formula, large = false }) => {
-        const parts = formula.split(/(\d+)/);
-        return (
-            <span className={`font-black tracking-widest ${large ? 'text-5xl md:text-7xl' : 'text-xl'} drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]`}>
-            {parts.map((part, index) => {
-                if (!isNaN(part) && part !== '') {
-                // Detect if the number comes right after a dot '·' (coefficient of a water molecule)
-                const prevPart = index > 0 ? parts[index-1] : '';
-                if (prevPart.endsWith('·') || prevPart.endsWith('· ')) {
-                    return <span key={index}>{part}</span>;
-                }
-                return <sub key={index} className={`${large ? 'text-3xl md:text-4xl' : 'text-sm'} font-bold text-cyan-300 relative top-2`}>{part}</sub>;
-                }
-                return <span key={index}>{part}</span>;
-            })}
-            </span>
-        );
+        const CATEGORY_MAP = {
+            0: 'Deconstruction', 1: 'Lignin Chemistry', 2: 'Nanocellulose', 3: 'Enzyme Catalysis',
+            4: 'Adv. Solvents', 5: 'Thermochemical', 6: 'Self-Assembly', 7: 'Characterization'
         };
 
-        // Multiple choice generator
+        // --- EXPANDING THE COMPRESSED DB ---
+        const conceptsDB = rawDB.map(row => ({
+            term: row[0],
+            definitions: [row[1]],
+            type: CATEGORY_MAP[row[2]]
+        }));
+
+        // Component to format short/long text smoothly
+        const FormatText = ({ text, large = false }) => {
+            const isLong = text.length > 40;
+            return (
+                <span className={`font-black tracking-wide ${large ? (isLong ? 'text-adaptive' : 'text-3xl md:text-5xl') : (isLong ? 'text-xs md:text-sm font-semibold leading-snug' : 'text-lg md:text-xl')} drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]`}>
+                    {text}
+                </span>
+            );
+        };
+
         const generateQuiz = () => {
-        const targetIndex = Math.floor(Math.random() * compoundsDB.length);
-        const target = compoundsDB[targetIndex];
-        
-        const questionType = Math.random() > 0.5 ? 'formula_to_name' : 'name_to_formula';
-        const options = new Set();
-        
-        let correctOptionStr = '';
-        if (questionType === 'formula_to_name') {
-            correctOptionStr = target.names[Math.floor(Math.random() * target.names.length)];
-        } else {
-            correctOptionStr = target.formula;
-        }
-        options.add(correctOptionStr);
+            const targetIndex = Math.floor(Math.random() * conceptsDB.length);
+            const target = conceptsDB[targetIndex];
+            
+            // Standardizing UI logic: Question = Definition, Options = Terms
+            const questionType = 'def_to_term';
+            const options = new Set();
+            
+            let correctOptionStr = target.term;
+            options.add(correctOptionStr);
 
-        while(options.size < 4) {
-            const randomCompound = compoundsDB[Math.floor(Math.random() * compoundsDB.length)];
-            if (randomCompound.formula !== target.formula) {
-            if (questionType === 'formula_to_name') {
-                const randomName = randomCompound.names[Math.floor(Math.random() * randomCompound.names.length)];
-                options.add(randomName);
-            } else {
-                options.add(randomCompound.formula);
+            while(options.size < 4) {
+                const randomConcept = conceptsDB[Math.floor(Math.random() * conceptsDB.length)];
+                if (randomConcept.term !== target.term) {
+                    // Try to pick from the SAME category to make it a PhD-level challenge
+                    if (Math.random() > 0.4 && randomConcept.type === target.type) {
+                        options.add(randomConcept.term);
+                    } else if (Math.random() > 0.7) {
+                        options.add(randomConcept.term);
+                    }
+                }
             }
-            }
-        }
 
-        const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
+            const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
 
-        return {
-            compound: target,
-            type: questionType,
-            questionText: questionType === 'formula_to_name' 
-            ? target.formula 
-            : target.names[Math.floor(Math.random() * target.names.length)], 
-            correctAnswer: correctOptionStr,
-            options: shuffledOptions
-        };
+            return {
+                compound: target,
+                type: questionType,
+                questionText: target.definitions[0],
+                correctAnswer: correctOptionStr,
+                options: shuffledOptions
+            };
         };
 
         function GameApp() {
-        const [gameState, setGameState] = useState('menu');
-        const [currentQuiz, setCurrentQuiz] = useState(null);
-        const [score, setScore] = useState(0);
-        const [lives, setLives] = useState(3);
-        const [combo, setCombo] = useState(1);
-        const [bestScore, setBestScore] = useState(0);
-        
-        const [attempts, setAttempts] = useState(0); 
-        const [tipQueue, setTipQueue] = useState([]);
-        
-        const [selectedAnswer, setSelectedAnswer] = useState(null);
-        const [isAnimating, setIsAnimating] = useState(false);
-        const [shakeEfx, setShakeEfx] = useState(false);
-        const [glowEfx, setGlowEfx] = useState(false);
-        const [showExplanation, setShowExplanation] = useState(false);
-        
-        const [showTip, setShowTip] = useState(false); 
-        const [currentTip, setCurrentTip] = useState(null);
+            const [gameState, setGameState] = useState('menu');
+            const [currentQuiz, setCurrentQuiz] = useState(null);
+            const [score, setScore] = useState(0);
+            const [lives, setLives] = useState(5); // Increased to 5 lives for this tough database
+            const [combo, setCombo] = useState(1);
+            const [bestScore, setBestScore] = useState(0);
+            
+            const [attempts, setAttempts] = useState(0); 
+            const [tipQueue, setTipQueue] = useState([]);
+            
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+            const [isAnimating, setIsAnimating] = useState(false);
+            const [shakeEfx, setShakeEfx] = useState(false);
+            const [glowEfx, setGlowEfx] = useState(false);
+            const [showExplanation, setShowExplanation] = useState(false);
+            
+            const [showTip, setShowTip] = useState(false); 
+            const [currentTip, setCurrentTip] = useState(null);
 
-        const startGame = () => {
-            setScore(0);
-            setLives(3);
-            setCombo(1);
-            setAttempts(0);
-            
-            // Shuffle tips at the start so they are random and don't repeat
-            const shuffledTips = [...advancedTips].sort(() => Math.random() - 0.5);
-            setTipQueue(shuffledTips);
-            
-            setCurrentQuiz(generateQuiz());
-            setShowExplanation(false);
-            setShowTip(false);
-            setGameState('playing');
-        };
-
-        const proceedToNextQuestion = (currentAttemptCount) => {
-            setSelectedAnswer(null);
-            setIsAnimating(false);
-            
-            // Every 5 attempts, if there are tips left, show one
-            if (currentAttemptCount % 5 === 0 && currentAttemptCount > 0 && tipQueue.length > 0) {
-                const nextTip = tipQueue[0];
-                setTipQueue(tipQueue.slice(1));
-                setCurrentTip(nextTip);
-                setShowTip(true);
-            } else {
+            const startGame = () => {
+                setScore(0);
+                setLives(5);
+                setCombo(1);
+                setAttempts(0);
+                
+                const shuffledTips = [...advancedTips].sort(() => Math.random() - 0.5);
+                setTipQueue(shuffledTips);
+                
                 setCurrentQuiz(generateQuiz());
-            }
-        };
+                setShowExplanation(false);
+                setShowTip(false);
+                setGameState('playing');
+            };
 
-        const handleAnswer = (answer) => {
-            if (isAnimating || showExplanation || showTip) return;
-            setIsAnimating(true);
-            setSelectedAnswer(answer);
-
-            const isCorrect = answer === currentQuiz.correctAnswer;
-            const newAttempts = attempts + 1;
-            setAttempts(newAttempts);
-
-            if (isCorrect) {
-            setGlowEfx(true);
-            const pointsEarned = 10 * combo;
-            setScore(s => s + pointsEarned);
-            setCombo(c => Math.min(c + 1, 5));
-            
-            setTimeout(() => {
-                setGlowEfx(false);
-                proceedToNextQuestion(newAttempts);
-            }, 800);
-
-            } else {
-            setShakeEfx(true);
-            setCombo(1); 
-            
-            setTimeout(() => {
-                setShakeEfx(false);
-                setShowExplanation(true);
-            }, 800);
-            }
-        };
-
-        const handleContinueAfterFailure = () => {
-            const newLives = lives - 1;
-            setLives(newLives);
-            setShowExplanation(false);
-
-            if (newLives <= 0) {
-                if (score > bestScore) setBestScore(score);
-                setGameState('gameover');
-            } else {
-                proceedToNextQuestion(attempts);
-            }
-        };
-
-        const handleCloseTip = () => {
-            setShowTip(false);
-            setCurrentQuiz(generateQuiz());
-        };
-
-        if (gameState === 'menu') {
-            return (
-            <div className="min-h-screen bg-[#0B0F19] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
-                <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-cyan-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
-                <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[150px] mix-blend-screen"></div>
-
-                <div className="z-10 text-center max-w-md w-full backdrop-blur-xl bg-white/5 border border-white/10 p-10 rounded-3xl shadow-[0_0_50px_rgba(6,182,212,0.15)]">
-                <div className="flex justify-center mb-6">
-                    <div className="relative">
-                    <Sparkles className="absolute -top-4 -right-4 text-cyan-400 animate-bounce" size={32} />
-                    <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-                        <Flame size={48} className="text-white" />
-                    </div>
-                    </div>
-                </div>
+            const proceedToNextQuestion = (currentAttemptCount) => {
+                setSelectedAnswer(null);
+                setIsAnimating(false);
                 
-                <h1 className="text-4xl md:text-5xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-300 to-teal-300 tracking-tight">
-                    Quantum<br/>Alchemist
-                </h1>
-                <p className="text-blue-200/70 mb-4 text-lg">Master inorganic chemistry.</p>
-                <div className="mb-10 text-sm bg-white/10 rounded-full py-1 px-4 text-cyan-200 inline-block border border-cyan-500/20">
-                    +200 compounds and 15 families
-                </div>
-                
-                <button 
-                    onClick={startGame}
-                    className="w-full relative group overflow-hidden rounded-2xl p-[2px]"
-                >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400 opacity-70 group-hover:opacity-100 animate-pulse transition-opacity"></div>
-                    <div className="relative bg-[#0B0F19] bg-opacity-90 px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all group-hover:bg-opacity-0">
-                    <Play className="text-white fill-current" size={24} />
-                    <span className="text-2xl font-bold tracking-wide">PLAY NOW</span>
-                    </div>
-                </button>
+                if (currentAttemptCount % 5 === 0 && currentAttemptCount > 0 && tipQueue.length > 0) {
+                    const nextTip = tipQueue[0];
+                    setTipQueue(tipQueue.slice(1));
+                    setCurrentTip(nextTip);
+                    setShowTip(true);
+                } else {
+                    setCurrentQuiz(generateQuiz());
+                }
+            };
 
-                {bestScore > 0 && (
-                    <div className="mt-8 flex items-center justify-center gap-2 text-cyan-300 font-semibold bg-white/5 py-3 rounded-full border border-cyan-500/20">
-                    <Trophy size={20} /> Best Score: {bestScore}
-                    </div>
-                )}
-                </div>
-            </div>
-            );
-        }
+            const handleAnswer = (answer) => {
+                if (isAnimating || showExplanation || showTip) return;
+                setIsAnimating(true);
+                setSelectedAnswer(answer);
 
-        if (gameState === 'gameover') {
-            return (
-            <div className="min-h-screen bg-[#0B0F19] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
-                <div className="absolute inset-0 bg-rose-900/20 z-0"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[600px] max-h-[600px] bg-rose-600/20 rounded-full blur-[100px]"></div>
+                const isCorrect = answer === currentQuiz.correctAnswer;
+                const newAttempts = attempts + 1;
+                setAttempts(newAttempts);
 
-                <div className="z-10 text-center max-w-md w-full backdrop-blur-2xl bg-[#0f1423]/80 border border-rose-500/30 p-10 rounded-3xl shadow-[0_0_50px_rgba(225,29,72,0.2)]">
-                <AlertTriangle className="mx-auto text-rose-500 mb-6" size={64} />
-                
-                <h2 className="text-4xl font-black text-white mb-2 tracking-tight">LABORATORY<br/>DESTROYED</h2>
-                <p className="text-rose-200/70 mb-8 text-lg">You ran out of lives!</p>
-
-                <div className="bg-white/5 rounded-2xl p-6 mb-8 border border-white/10">
-                    <p className="text-sm text-slate-400 uppercase tracking-widest font-bold mb-1">Final Score</p>
-                    <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-orange-400">{score}</p>
-                </div>
-
-                <button 
-                    onClick={startGame}
-                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold text-xl py-5 rounded-2xl flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(14,165,233,0.4)] transition-transform active:scale-95"
-                >
-                    <RotateCcw size={24} /> Try Again
-                </button>
-                </div>
-            </div>
-            );
-        }
-
-        return (
-            <div className={`min-h-screen bg-[#0B0F19] text-white flex flex-col font-sans overflow-hidden transition-colors duration-300 ${shakeEfx ? 'animate-shake' : ''} ${glowEfx ? 'bg-emerald-950/40' : ''}`}>
-            
-            {/* FAILURE EXPLANATION OVERLAY */}
-            {showExplanation && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300">
-                <div className="bg-[#13192B] border border-rose-500/50 p-6 md:p-8 rounded-3xl max-w-lg w-full shadow-[0_0_60px_rgba(225,29,72,0.3)] transform transition-all">
+                if (isCorrect) {
+                    setGlowEfx(true);
+                    const pointsEarned = 10 * combo;
+                    setScore(s => s + pointsEarned);
+                    setCombo(c => Math.min(c + 1, 5));
                     
-                    <div className="flex items-center gap-3 mb-6">
-                    <div className="bg-rose-500/20 p-3 rounded-full">
-                        <XCircle className="text-rose-500" size={32} />
-                    </div>
-                    <h2 className="text-3xl font-black text-white">Calculation Error!</h2>
-                    </div>
+                    setTimeout(() => {
+                        setGlowEfx(false);
+                        proceedToNextQuestion(newAttempts);
+                    }, 800);
+                } else {
+                    setShakeEfx(true);
+                    setCombo(1); 
+                    
+                    setTimeout(() => {
+                        setShakeEfx(false);
+                        setShowExplanation(true);
+                    }, 800);
+                }
+            };
 
-                    <div className="bg-white/5 rounded-2xl p-5 mb-6 border border-white/10">
-                    <p className="text-sm text-slate-400 uppercase tracking-widest font-bold mb-2">The correct answer was:</p>
-                    <div className="text-2xl md:text-3xl font-black text-emerald-400 capitalize">
-                        {currentQuiz.type === 'name_to_formula' 
-                        ? <FormatFormula formula={currentQuiz.correctAnswer} /> 
-                        : currentQuiz.correctAnswer}
-                    </div>
-                    </div>
+            const handleContinueAfterFailure = () => {
+                const newLives = lives - 1;
+                setLives(newLives);
+                setShowExplanation(false);
 
-                    <div className="bg-blue-900/30 rounded-2xl p-5 mb-8 border border-blue-500/30">
-                    <div className="flex items-center gap-2 mb-2">
-                        <Info size={20} className="text-cyan-400" />
-                        <h3 className="font-bold text-cyan-300 text-lg uppercase tracking-wide">
-                        Review: {currentQuiz.compound.type}
-                        </h3>
+                if (newLives <= 0) {
+                    if (score > bestScore) setBestScore(score);
+                    setGameState('gameover');
+                } else {
+                    proceedToNextQuestion(attempts);
+                }
+            };
+
+            const handleCloseTip = () => {
+                setShowTip(false);
+                setCurrentQuiz(generateQuiz());
+            };
+
+            if (gameState === 'menu') {
+                return (
+                <div className="min-h-screen bg-[#0B0F19] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
+                    <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-cyan-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
+                    <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[150px] mix-blend-screen"></div>
+
+                    <div className="z-10 text-center max-w-md w-full backdrop-blur-xl bg-white/5 border border-white/10 p-10 rounded-3xl shadow-[0_0_50px_rgba(6,182,212,0.15)]">
+                    <div className="flex justify-center mb-6">
+                        <div className="relative">
+                        <Sparkles className="absolute -top-4 -right-4 text-cyan-400 animate-bounce" size={32} />
+                        <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+                            <Flame size={48} className="text-white" />
+                        </div>
+                        </div>
                     </div>
-                    <p className="text-blue-100/80 leading-relaxed text-lg">
-                        {explanationsDB[currentQuiz.compound.type]}
-                    </p>
-                    <p className="mt-3 text-sm text-cyan-300/60 font-medium flex items-center gap-2">
-                        Applies to the compound: <FormatFormula formula={currentQuiz.compound.formula} />
-                    </p>
+                    
+                    <h1 className="text-4xl md:text-5xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-300 to-teal-300 tracking-tight">
+                        Ligno-Alchemist
+                    </h1>
+                    <p className="text-blue-200/70 mb-4 text-lg">Master PhD-Level Biomass Mechanics</p>
+                    <div className="mb-10 text-xs md:text-sm bg-white/10 rounded-full py-2 px-4 text-cyan-200 inline-block border border-cyan-500/20 font-medium tracking-wide">
+                        Compression Matrix: 380+ Concepts Loaded
+                    </div>
+                    
+                    <button 
+                        onClick={startGame}
+                        className="w-full relative group overflow-hidden rounded-2xl p-[2px]"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400 opacity-70 group-hover:opacity-100 animate-pulse transition-opacity"></div>
+                        <div className="relative bg-[#0B0F19] bg-opacity-90 px-8 py-5 rounded-2xl flex items-center justify-center gap-3 transition-all group-hover:bg-opacity-0">
+                        <Play className="text-white fill-current" size={24} />
+                        <span className="text-2xl font-bold tracking-wide">PLAY NOW</span>
+                        </div>
+                    </button>
+
+                    {bestScore > 0 && (
+                        <div className="mt-8 flex items-center justify-center gap-2 text-cyan-300 font-semibold bg-white/5 py-3 rounded-full border border-cyan-500/20">
+                        <Trophy size={20} /> Best Impact Factor: {bestScore}
+                        </div>
+                    )}
+                    </div>
+                </div>
+                );
+            }
+
+            if (gameState === 'gameover') {
+                return (
+                <div className="min-h-screen bg-[#0B0F19] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
+                    <div className="absolute inset-0 bg-rose-900/20 z-0"></div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[600px] max-h-[600px] bg-rose-600/20 rounded-full blur-[100px]"></div>
+
+                    <div className="z-10 text-center max-w-md w-full backdrop-blur-2xl bg-[#0f1423]/80 border border-rose-500/30 p-10 rounded-3xl shadow-[0_0_50px_rgba(225,29,72,0.2)]">
+                    <AlertTriangle className="mx-auto text-rose-500 mb-6" size={64} />
+                    
+                    <h2 className="text-4xl font-black text-white mb-2 tracking-tight">THESIS<br/>REJECTED</h2>
+                    <p className="text-rose-200/70 mb-8 text-lg">You ran out of lives!</p>
+
+                    <div className="bg-white/5 rounded-2xl p-6 mb-8 border border-white/10">
+                        <p className="text-sm text-slate-400 uppercase tracking-widest font-bold mb-1">Final Score</p>
+                        <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-orange-400">{score}</p>
                     </div>
 
                     <button 
-                    onClick={handleContinueAfterFailure}
-                    className="w-full bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-500 hover:to-orange-400 text-white font-bold text-xl py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95"
+                        onClick={startGame}
+                        className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold text-xl py-5 rounded-2xl flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(14,165,233,0.4)] transition-transform active:scale-95"
                     >
-                    Got it, continue <ArrowRight size={24} />
+                        <RotateCcw size={24} /> Back to the Lab
                     </button>
-                </div>
-                </div>
-            )}
-
-            {/* CHECKPOINT OVERLAY */}
-            {showTip && currentTip && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300">
-                <div className="bg-[#0B1221] border border-cyan-500/50 p-6 md:p-8 rounded-3xl max-w-lg w-full shadow-[0_0_60px_rgba(6,182,212,0.3)] transform transition-all relative overflow-hidden">
-                    
-                    <div className="absolute top-[-50px] right-[-50px] w-[150px] h-[150px] bg-cyan-600/20 rounded-full blur-[50px]"></div>
-
-                    <div className="flex items-center gap-3 mb-6 relative z-10">
-                    <div className="bg-cyan-500/20 p-3 rounded-full border border-cyan-500/30">
-                        <Lightbulb className="text-cyan-400" size={32} />
                     </div>
-                    <div>
-                        <h2 className="text-2xl font-black text-white">Scientific Checkpoint</h2>
-                        <p className="text-cyan-300/70 text-sm font-bold uppercase tracking-widest">{attempts} compounds analyzed</p>
-                    </div>
-                    </div>
+                </div>
+                );
+            }
 
-                    <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/20 rounded-2xl p-6 mb-8 border border-cyan-500/30 relative z-10">
-                    <h3 className="font-bold text-cyan-300 text-lg uppercase tracking-wide mb-3 border-b border-cyan-500/30 pb-2">
-                        💡 Tip: {currentTip.title}
-                    </h3>
-                    <p className="text-blue-100 leading-relaxed text-xl font-medium">
-                        {currentTip.content}
-                    </p>
-                    </div>
-
-                    <button 
-                    onClick={handleCloseTip}
-                    className="relative z-10 w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-xl py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_10px_20px_rgba(6,182,212,0.3)] transition-transform active:scale-95"
-                    >
-                    Continue Researching <ArrowRight size={24} />
-                    </button>
-                </div>
-                </div>
-            )}
-
-            <div className="flex justify-between items-center p-6 md:p-8 z-10 bg-gradient-to-b from-[#0B0F19] to-transparent">
-                <div className="flex gap-2">
-                {[...Array(3)].map((_, i) => (
-                    <div key={i} className={`transition-all duration-300 ${i < lives ? 'text-rose-500 drop-shadow-[0_0_10px_rgba(244,63,94,0.8)]' : 'text-slate-800'}`}>
-                        <Heart size={32} className={i < lives ? "fill-current" : "fill-current"} />
-                    </div>
-                ))}
-                </div>
-
-                <div className="flex flex-col items-end">
-                <div className="text-3xl md:text-4xl font-black tracking-tighter text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-                    {score.toString().padStart(4, '0')}
-                </div>
-                {combo > 1 && (
-                    <div className="flex items-center gap-1 text-cyan-400 font-bold text-lg animate-pulse">
-                    <Zap size={16} className="fill-current" /> COMBO x{combo}
-                    </div>
-                )}
-                </div>
-            </div>
-
-            <div className={`flex-1 flex flex-col items-center justify-center p-6 z-10 transition-opacity duration-300 ${(showExplanation || showTip) ? 'opacity-30 blur-sm pointer-events-none' : 'opacity-100'}`}>
-                <div className="text-cyan-300/60 font-bold tracking-widest uppercase mb-4 text-sm md:text-base flex items-center gap-2">
-                {currentQuiz.compound.type}
-                </div>
+            return (
+                <div className={`min-h-screen bg-[#0B0F19] text-white flex flex-col font-sans overflow-hidden transition-colors duration-300 ${shakeEfx ? 'animate-shake' : ''} ${glowEfx ? 'bg-emerald-950/40' : ''}`}>
                 
-                <div className="h-40 md:h-56 flex items-center justify-center animate-[float_4s_ease-in-out_infinite] animate-float">
-                {currentQuiz.type === 'formula_to_name' ? (
-                    <FormatFormula formula={currentQuiz.questionText} large={true} />
-                ) : (
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-center text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 drop-shadow-sm px-4">
-                    <span className="capitalize">{currentQuiz.questionText}</span>
-                    </h2>
-                )}
-                </div>
-            </div>
-
-            <div className={`p-4 md:p-8 z-10 w-full max-w-4xl mx-auto pb-12 transition-opacity duration-300 ${(showExplanation || showTip) ? 'opacity-30 blur-sm pointer-events-none' : 'opacity-100'}`}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {currentQuiz.options.map((option, index) => {
-                    
-                    let btnStyle = "bg-white/5 border-white/10 hover:bg-white/10 text-slate-200";
-                    let formatAsFormula = currentQuiz.type === 'name_to_formula';
-
-                    if (selectedAnswer !== null) {
-                    if (option === currentQuiz.correctAnswer) {
-                        btnStyle = "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_30px_rgba(52,211,153,0.3)] ring-2 ring-emerald-400 scale-[1.02]";
-                    } else if (option === selectedAnswer && option !== currentQuiz.correctAnswer) {
-                        btnStyle = "bg-rose-500/20 border-rose-500 text-rose-300 shadow-[0_0_20px_rgba(244,63,94,0.3)] opacity-50";
-                    } else {
-                        btnStyle = "bg-white/5 border-white/5 text-slate-500 opacity-40";
-                    }
-                    }
-
-                    return (
-                    <button
-                        key={index}
-                        onClick={() => handleAnswer(option)}
-                        disabled={isAnimating || showExplanation || showTip}
-                        className={`relative w-full p-6 md:p-8 rounded-2xl border-2 backdrop-blur-md transition-all duration-300 text-xl md:text-2xl font-bold flex items-center justify-center text-center overflow-hidden active:scale-95 ${btnStyle}`}
-                    >
-                        {selectedAnswer === null && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-white/5 to-cyan-500/0 opacity-0 hover:opacity-100 transition-opacity duration-500 transform -translate-x-full hover:translate-x-full"></div>
-                        )}
+                {/* FAILURE EXPLANATION OVERLAY */}
+                {showExplanation && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300">
+                    <div className="bg-[#13192B] border border-rose-500/50 p-6 md:p-8 rounded-3xl max-w-lg w-full shadow-[0_0_60px_rgba(225,29,72,0.3)] transform transition-all">
                         
-                        {formatAsFormula ? (
-                        <FormatFormula formula={option} />
-                        ) : (
-                        <span className="capitalize">{option}</span>
-                        )}
-                    </button>
-                    );
-                })}
+                        <div className="flex items-center gap-3 mb-6">
+                        <div className="bg-rose-500/20 p-3 rounded-full flex-shrink-0">
+                            <XCircle className="text-rose-500" size={32} />
+                        </div>
+                        <h2 className="text-2xl md:text-3xl font-black text-white">Concept Error!</h2>
+                        </div>
+
+                        <div className="bg-white/5 rounded-2xl p-5 mb-6 border border-white/10">
+                        <p className="text-sm text-slate-400 uppercase tracking-widest font-bold mb-2">The correct assignment was:</p>
+                        <div className="text-2xl font-black text-emerald-400">
+                            <FormatText text={currentQuiz.correctAnswer} /> 
+                        </div>
+                        </div>
+
+                        <div className="bg-blue-900/30 rounded-2xl p-5 mb-8 border border-blue-500/30">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Info size={20} className="text-cyan-400" />
+                            <h3 className="font-bold text-cyan-300 text-lg uppercase tracking-wide">
+                            Domain: {currentQuiz.compound.type}
+                            </h3>
+                        </div>
+                        <p className="text-blue-100/80 leading-relaxed text-[0.95rem] md:text-base">
+                            {explanationsDB[currentQuiz.compound.type] || "Highly specialized research node."}
+                        </p>
+                        </div>
+
+                        <button 
+                        onClick={handleContinueAfterFailure}
+                        className="w-full bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-500 hover:to-orange-400 text-white font-bold text-xl py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95"
+                        >
+                        Acknowledge <ArrowRight size={24} />
+                        </button>
+                    </div>
+                    </div>
+                )}
+
+                {/* CHECKPOINT OVERLAY */}
+                {showTip && currentTip && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300">
+                    <div className="bg-[#0B1221] border border-cyan-500/50 p-6 md:p-8 rounded-3xl max-w-lg w-full shadow-[0_0_60px_rgba(6,182,212,0.3)] transform transition-all relative overflow-hidden">
+                        
+                        <div className="absolute top-[-50px] right-[-50px] w-[150px] h-[150px] bg-cyan-600/20 rounded-full blur-[50px]"></div>
+
+                        <div className="flex items-center gap-3 mb-6 relative z-10">
+                        <div className="bg-cyan-500/20 p-3 rounded-full border border-cyan-500/30 flex-shrink-0">
+                            <Lightbulb className="text-cyan-400" size={32} />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-black text-white">Literature Review</h2>
+                            <p className="text-cyan-300/70 text-sm font-bold uppercase tracking-widest">{attempts} Concepts Analyzed</p>
+                        </div>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/20 rounded-2xl p-6 mb-8 border border-cyan-500/30 relative z-10">
+                        <h3 className="font-bold text-cyan-300 text-lg uppercase tracking-wide mb-3 border-b border-cyan-500/30 pb-2">
+                            💡 State of the Art: {currentTip.title}
+                        </h3>
+                        <p className="text-blue-100 leading-relaxed text-base md:text-lg font-medium">
+                            {currentTip.content}
+                        </p>
+                        </div>
+
+                        <button 
+                        onClick={handleCloseTip}
+                        className="relative z-10 w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-xl py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_10px_20px_rgba(6,182,212,0.3)] transition-transform active:scale-95"
+                        >
+                        Resume Analysis <ArrowRight size={24} />
+                        </button>
+                    </div>
+                    </div>
+                )}
+
+                <div className="flex justify-between items-center p-4 md:p-8 z-10 bg-gradient-to-b from-[#0B0F19] to-transparent">
+                    <div className="flex gap-1.5 flex-wrap max-w-[50%]">
+                    {[...Array(5)].map((_, i) => (
+                        <div key={i} className={`transition-all duration-300 ${i < lives ? 'text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]' : 'text-slate-800'}`}>
+                            <Heart size={28} className={i < lives ? "fill-current" : "fill-current"} />
+                        </div>
+                    ))}
+                    </div>
+
+                    <div className="flex flex-col items-end flex-shrink-0">
+                    <div className="text-3xl md:text-4xl font-black tracking-tighter text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+                        {score.toString().padStart(4, '0')}
+                    </div>
+                    {combo > 1 && (
+                        <div className="flex items-center gap-1 text-cyan-400 font-bold text-sm md:text-lg animate-pulse">
+                        <Zap size={16} className="fill-current" /> COMBO x{combo}
+                        </div>
+                    )}
+                    </div>
                 </div>
-            </div>
-            </div>
-        );
+
+                <div className={`flex-1 flex flex-col items-center justify-center p-6 md:p-12 z-10 transition-opacity duration-300 ${(showExplanation || showTip) ? 'opacity-30 blur-sm pointer-events-none' : 'opacity-100'}`}>
+                    <div className="text-cyan-300/60 font-bold tracking-widest uppercase mb-4 text-xs md:text-sm flex items-center gap-2">
+                    {currentQuiz.compound.type} Analysis
+                    </div>
+                    
+                    <div className="flex items-center justify-center min-h-[140px] md:min-h-[200px] animate-[float_4s_ease-in-out_infinite] animate-float max-w-4xl w-full text-center px-4">
+                        <FormatText text={currentQuiz.questionText} large={true} />
+                    </div>
+                </div>
+
+                <div className={`p-4 md:p-8 z-10 w-full max-w-5xl mx-auto pb-12 transition-opacity duration-300 ${(showExplanation || showTip) ? 'opacity-30 blur-sm pointer-events-none' : 'opacity-100'}`}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                    {currentQuiz.options.map((option, index) => {
+                        
+                        let btnStyle = "bg-white/5 border-white/10 hover:bg-white/10 text-slate-200";
+
+                        if (selectedAnswer !== null) {
+                        if (option === currentQuiz.correctAnswer) {
+                            btnStyle = "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_30px_rgba(52,211,153,0.3)] ring-2 ring-emerald-400 scale-[1.02]";
+                        } else if (option === selectedAnswer && option !== currentQuiz.correctAnswer) {
+                            btnStyle = "bg-rose-500/20 border-rose-500 text-rose-300 shadow-[0_0_20px_rgba(244,63,94,0.3)] opacity-50";
+                        } else {
+                            btnStyle = "bg-white/5 border-white/5 text-slate-500 opacity-40";
+                        }
+                        }
+
+                        return (
+                        <button
+                            key={index}
+                            onClick={() => handleAnswer(option)}
+                            disabled={isAnimating || showExplanation || showTip}
+                            className={`relative w-full p-5 md:p-8 rounded-2xl border-2 backdrop-blur-md transition-all duration-300 flex items-center justify-center text-center overflow-hidden active:scale-95 ${btnStyle}`}
+                        >
+                            {selectedAnswer === null && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-white/5 to-cyan-500/0 opacity-0 hover:opacity-100 transition-opacity duration-500 transform -translate-x-full hover:translate-x-full"></div>
+                            )}
+                            
+                            <FormatText text={option} />
+                        </button>
+                        );
+                    })}
+                    </div>
+                </div>
+                </div>
+            );
         }
 
-        // Render the application inside the #root div
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<GameApp />);
     </script>
 </body>
 </html>
+
+
