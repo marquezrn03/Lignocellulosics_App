@@ -1,9 +1,9 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Biomancer RPG - Ultimate Database Edition</title>
+    <title>Biomancer RPG - Ultimate Edition</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -43,22 +43,24 @@
         .spell-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         @media (hover: hover) { .spell-btn:hover { transform: translateY(-3px) scale(1.02); } }
         .spell-btn:active { transform: scale(0.95); }
+        
+        /* Loader Styles directly inline to prevent black screen on slow networks */
         .loader-ring { display: inline-block; width: 80px; height: 80px; }
         .loader-ring:after { content: " "; display: block; width: 64px; height: 64px; margin: 8px; border-radius: 50%; border: 6px solid #10b981; border-color: #10b981 transparent #10b981 transparent; animation: loader-ring 1.2s linear infinite; }
         @keyframes loader-ring { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div id="initial-loader" class="min-h-[100dvh] flex flex-col items-center justify-center bg-[#030712] text-emerald-400">
+    <!-- Fallback Loader with INLINE styles so it never shows a black screen -->
+    <div id="initial-loader" style="height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #030712; color: #10b981; font-family: 'Share Tech Mono', monospace;">
         <div class="loader-ring"></div>
-        <h2 class="font-tech mt-4 text-xl tracking-widest animate-pulse">LOADING BIO-DB...</h2>
+        <h2 style="margin-top: 20px; font-size: 1.25rem; letter-spacing: 0.1em; animation: pulse 2s infinite;">LOADING BIO-DB...</h2>
     </div>
     <div id="root"></div>
 
     <script type="text/babel">
         // ---------------------------------------------------------------------------------
         // MASSIVE 400+ CONCEPT DATABASE 
-        // Categories: 0:Comp, 1:Pretreat, 2:Chem, 3:Cat, 4:Nano, 5:Analyt, 6:Thermo, 7:SelfAssem, 8:Industry/TEA
         // ---------------------------------------------------------------------------------
         const rawDB = [
             // COMPOSITION (0)
@@ -79,7 +81,7 @@
             ["Compression Wood", "Reaction wood in gymnosperms characterized by elevated H-lignin content and shorter tracheids", 0],
             ["Glucuronoxylan", "The dominant hemicellulose in hardwoods, typically possessing 4-O-methylglucuronic acid side groups", 0],
             ["Callose", "A plant polysaccharide composed of β-1,3-glucan linkages, often deposited in response to wounding or stress", 0],
-            ["Microfibril Angle (MFA)", "The angle between the helical winding of cellulose microfibrils and the longitudinal axis of the cell", 0],
+            ["Microfibril Angle", "The angle between the helical winding of cellulose microfibrils and the longitudinal axis of the cell", 0],
             ["Degree of Polymerization", "The number of repeating anhydroglucose units in a cellulose chain, dictating intrinsic mechanical strength", 0],
             
             // PRETREATMENT (1)
@@ -90,17 +92,16 @@
             ["Organosolv", "Extraction of high-purity, sulfur-free lignin using aqueous-organic solvent mixtures like ethanol", 1],
             ["Pseudo-lignin", "A recalcitrant aromatic polymer formed from the condensation of carbohydrate degradation products at high severity", 1],
             ["CELF", "Co-solvent Enhanced Lignocellulosic Fractionation using THF/water to maintain lignin solubilization", 1],
-            ["Deep Eutectic Solvents (DES)", "Tunable mixtures of H-bond donors and acceptors presenting massive freezing point depressions", 1],
+            ["Deep Eutectic Solvents", "Tunable mixtures of H-bond donors and acceptors presenting massive freezing point depressions", 1],
             ["Ionic Liquids", "Salts like [C2mim][OAc] that remain liquid at room temperature, capable of entirely dissolving cellulose", 1],
-            ["Liquid Hot Water (LHW)", "Pretreatment utilizing strictly pressurized water at 160-220°C to auto-hydrolyze hemicellulose", 1],
+            ["Liquid Hot Water", "Pretreatment utilizing strictly pressurized water at 160-220°C to auto-hydrolyze hemicellulose", 1],
             ["Severity Factor (R0)", "A mathematical metric combining temperature and residence time to quantify the intensity of a pretreatment", 1],
             ["Ozonolysis", "A highly oxidative pretreatment that specifically cleaves aromatic rings in lignin at room temperature", 1],
-            ["Gamma-Valerolactone (GVL)", "A sustainable bio-based solvent that enables near-complete solubilization of native carbohydrates and lignin", 1],
+            ["Gamma-Valerolactone", "A sustainable bio-based solvent that enables near-complete solubilization of native carbohydrates and lignin", 1],
             ["Alkaline Pretreatment", "Use of bases like NaOH or Ca(OH)2 to saponify intermolecular ester bonds and remove lignin", 1],
             ["SPORL", "Sulfite Pretreatment to Overcome Recalcitrance of Lignocellulose, highly effective for softwoods", 1],
             ["Twin-Screw Extrusion", "A continuous mechano-chemical pretreatment applying high shear, heat, and pressure to disrupt biomass", 1],
             ["Cavitation Pretreatment", "Use of hydrodynamic or acoustic forces to generate and collapse microbubbles, physically tearing cell walls", 1],
-            ["Choline Chloride:Lactic Acid", "A highly studied natural deep eutectic solvent (NADES) specifically effective for lignin extraction", 1],
 
             // LIGNIN CHEMISTRY (2)
             ["Coniferyl Alcohol", "The primary monolignol precursor that polymerizes to form G-type lignin in softwoods", 2],
@@ -117,7 +118,6 @@
             ["C-Lignin", "A highly linear native homopolymer of caffeyl alcohol linked entirely by benzodioxane structures", 2],
             ["Lignin Repolymerization", "The unwanted condensation of highly reactive carbocations forming resilient C-C bonds during acidic fractionation", 2],
             ["Phenolic Hydroxyl", "The critical reactive group on a lignin ring that dictates its antioxidant potential and reactivity", 2],
-            ["Aliphatic Hydroxyl", "Hydroxyl groups located on the propane side chain of lignin, typically less reactive than phenolic hydroxyls", 2],
             ["Syringyl/Guaiacyl Ratio", "A metric dictating lignin's structural linearity and reactivity; higher values indicate easier depolymerization", 2],
             ["Quinone Methide", "A highly reactive intermediate formed during lignin biosynthesis and chemical pulping reactions", 2],
             ["Radical Coupling", "The non-enzymatic, combinatory chemical process by which monolignols polymerize into the 3D lignin macromolecule", 2],
@@ -130,15 +130,13 @@
             ["Exo-Exo Synergy", "The critical cooperative catalytic action between CBH I and CBH II acting simultaneously on opposite ends", 3],
             ["LPMO (AA9)", "A copper-dependent metalloenzyme that obligately requires an electron donor and H2O2 to oxidatively cleave crystalline cellulose", 3],
             ["Laccase", "A multi-copper oxidase catalyzing the one-electron oxidation of phenolic lignin units, tightly coupled with O2 reduction", 3],
-            ["Lignin Peroxidase (LiP)", "A high redox-potential heme enzyme secreted by white-rot fungi capable of oxidizing non-phenolic lignin structures", 3],
-            ["Manganese Peroxidase (MnP)", "An enzyme that oxidizes Mn2+ to Mn3+, which then acts as a diffusible mediator to oxidize terminal phenolic lignin", 3],
+            ["Lignin Peroxidase", "A high redox-potential heme enzyme secreted by white-rot fungi capable of oxidizing non-phenolic lignin structures", 3],
+            ["Manganese Peroxidase", "An enzyme that oxidizes Mn2+ to Mn3+, which then acts as a diffusible mediator to oxidize terminal phenolic lignin", 3],
             ["Xylanase", "An enzyme that breaks down the linear polysaccharide β-1,4-xylan into xylose, critical for hemicellulose depolymerization", 3],
-            ["Consolidated Bioprocessing (CBP)", "A highly efficient biological paradigm where enzyme production, hydrolysis, and fermentation occur in a single microbial step", 3],
+            ["Consolidated Bioprocess", "A highly efficient biological paradigm where enzyme production, hydrolysis, and fermentation occur in a single step", 3],
             ["Product Inhibition", "The phenomenon where accumulated sugars (like cellobiose) competitively bind to and halt the activity of cellulases", 3],
-            ["Cellobiose Dehydrogenase (CDH)", "An extracellular flavocytochrome enzyme that oxidizes cellobiose to cellobiono-1,5-lactone, often feeding electrons to LPMOs", 3],
-            ["Versatile Peroxidase (VP)", "A hybrid fungal enzyme combining the catalytic properties of both LiP and MnP for broad-spectrum lignin degradation", 3],
+            ["Cellobiose Dehydrogenase", "An extracellular flavocytochrome enzyme that oxidizes cellobiose to cellobiono-1,5-lactone, often feeding electrons to LPMOs", 3],
             ["ABTS", "A common synthetic redox mediator used to expand the substrate range of laccases to non-phenolic lignin units", 3],
-            ["Simultaneous Saccharification & Fermentation", "A process where enzymatic hydrolysis and microbial fermentation run concurrently in the same reactor to prevent product inhibition", 3],
             ["Feedback Inhibition", "A regulatory mechanism where the end-product of a metabolic pathway allosterically inhibits an upstream enzyme", 3],
             ["AlphaFold3", "An advanced AI model utilized to predict novel, hyper-stable enzyme structures for cellulosic depolymerization", 3],
 
@@ -147,22 +145,17 @@
             ["Cellulose II", "The most thermodynamically stable allomorph, featuring tightly packed antiparallel glucan chains", 4],
             ["Cellulose III", "A rare allomorph formed exclusively by treating native cellulose with liquid ammonia, altering lattice spacing", 4],
             ["TEMPO Oxidation", "Regioselective catalytic conversion of C6 primary hydroxyls to carboxylate groups to facilitate CNF fibrillation", 4],
-            ["CNC (Cellulose Nanocrystals)", "Highly crystalline, rod-like nanoparticles isolated via sulfuric acid hydrolysis of amorphous regions", 4],
-            ["CNF (Cellulose Nanofibrils)", "Long, flexible, entangled nanoscale fibers produced via intense mechanical shearing or microfluidization", 4],
-            ["BNC (Bacterial Nanocellulose)", "An ultra-pure, highly crystalline 3D nanofibril network exuded extracellularly by Komagataeibacter xylinus", 4],
+            ["Cellulose Nanocrystals", "Highly crystalline, rod-like nanoparticles isolated via sulfuric acid hydrolysis of amorphous regions", 4],
+            ["Cellulose Nanofibrils", "Long, flexible, entangled nanoscale fibers produced via intense mechanical shearing or microfluidization", 4],
+            ["Bacterial Nanocellulose", "An ultra-pure, highly crystalline 3D nanofibril network exuded extracellularly by Komagataeibacter xylinus", 4],
             ["Sulfate Half-Ester", "The charged surface moiety grafted onto CNCs during H2SO4 hydrolysis, generating electrostatic repulsion", 4],
             ["Hornification", "The irreversible inter-fibrillar hydrogen bonding that occurs upon pulp drying, drastically reducing internal pore volume", 4],
             ["Periodate Oxidation", "A precise chemical cleavage of the C2-C3 glucopyranose bond, yielding highly reactive dialdehyde cellulose (DAC)", 4],
             ["Shear Thinning", "The non-Newtonian rheological behavior of nanocellulose hydrogels where viscosity decreases under applied shear stress", 4],
-            ["Thixotropy", "A time-dependent rheological property where a nanocellulose gel becomes fluid when agitated and resets to a gel when rested", 4],
+            ["Thixotropy", "A time-dependent rheological property where a nanocellulose gel becomes fluid when agitated and resets when rested", 4],
             ["Storage Modulus (G')", "A rheological metric representing the elastic, solid-like behavior and structural integrity of a nanocellulose hydrogel", 4],
             ["Loss Modulus (G'')", "A rheological metric representing the viscous, liquid-like energy dissipation of a nanocellulose suspension", 4],
-            ["Yield Stress", "The critical amount of force required to initiate flow in a solid-like nanocellulose gel network", 4],
-            ["Carboxymethylation", "A chemical pre-treatment introducing negatively charged chloroacetic acid groups to facilitate energy-efficient mechanical fibrillation", 4],
-            ["Specific Surface Area", "A measurement of total surface area per unit of mass, critically high in CNFs (often >100 m2/g) enabling high reactivity", 4],
-            ["Percolation Threshold", "The critical minimum concentration of CNCs required to form a continuous, interconnected geometric network", 4],
-            ["WVTR", "Water Vapor Transmission Rate: a crucial metric for packaging, naturally poor in hydrophilic nanocellulose films unless modified", 4],
-            ["OTR", "Oxygen Transmission Rate: a metric for packaging where dense nanocellulose films exhibit exceptionally high barrier performance", 4],
+            ["Carboxymethylation", "A chemical pre-treatment introducing negatively charged chloroacetic acid groups to facilitate energy-efficient fibrillation", 4],
 
             // ANALYTICS & PHYSICS (5)
             ["2D HSQC NMR", "An advanced resonance technique resolving overlapping 1H-13C signals to precisely identify native lignin inter-unit linkages", 5],
@@ -170,17 +163,14 @@
             ["13C CP/MAS NMR", "Solid-state nuclear magnetic resonance utilized to directly assess the crystallinity index and allomorphs of intact cellulose", 5],
             ["Thioacidolysis", "A severe chemical degradative method specifically cleaving β-O-4 bonds to accurately quantify uncondensed lignin monomers", 5],
             ["Py-GC/MS", "Analytical pyrolysis coupled with mass spectrometry to determine absolute S/G/H ratios in intact lignocellulose", 5],
-            ["SAXS (Small Angle X-ray)", "A technique utilized to measure the nanoscale dimensions and mesoporous fractal nature of intact microfibrils", 5],
-            ["GPC / SEC", "Gel Permeation Chromatography: A size-exclusion method used to determine the molecular weight distribution (Mw, Mn, PDI) of polymers", 5],
+            ["SAXS", "Small Angle X-ray Scattering: A technique utilized to measure the nanoscale dimensions and mesoporous fractal nature of intact microfibrils", 5],
+            ["GPC / SEC", "Gel Permeation Chromatography: A size-exclusion method used to determine the molecular weight distribution of polymers", 5],
             ["MALDI-TOF", "A soft ionization mass spectrometry technique excellent for determining the precise molecular weights of intact lignin oligomers", 5],
             ["Zeta Potential", "The electrokinetic potential measurement determining the electrical double-layer repulsion and overall colloidal stability", 5],
-            ["FTIR Fingerprint Region", "The mid-infrared spectral region (1800-800 cm-1) used to identify specific functional groups like carbonyls and aromatic skeletal vibrations", 5],
-            ["AFM (Atomic Force Microscopy)", "A high-resolution scanning probe technique used to visualize the surface topography and stiffness of single cellulose microfibrils", 5],
-            ["TGA (Thermogravimetric Analysis)", "An analytical technique measuring mass loss as a function of temperature to determine the thermal stability of biomass components", 5],
-            ["DSC (Differential Scanning Calorimetry)", "A thermoanalytical technique measuring heat flow to detect phase transitions, such as the glass transition temperature (Tg) of lignin", 5],
+            ["FTIR Fingerprint", "The mid-infrared spectral region (1800-800 cm-1) used to identify specific functional groups like carbonyls and aromatic rings", 5],
+            ["Atomic Force Microscopy", "A high-resolution scanning probe technique used to visualize the surface topography and stiffness of single cellulose microfibrils", 5],
             ["Klason Lignin", "The classical gravimetric method to determine acid-insoluble lignin by completely hydrolyzing carbohydrates with 72% sulfuric acid", 5],
             ["Acid-Soluble Lignin", "The small fraction of lignin that escapes Klason precipitation and must be quantified via UV-Vis spectrophotometry", 5],
-            ["Segal Method", "An empirical calculation using XRD peak intensities to roughly estimate the crystallinity index of a cellulose sample", 5],
 
             // THERMOCHEMISTRY (6)
             ["Fast Pyrolysis", "Extremely rapid thermal decomposition (500°C, <2s residence time) engineered specifically to maximize liquid bio-oil yields", 6],
@@ -188,16 +178,13 @@
             ["Furfural", "A versatile platform chemical formed via the acid-catalyzed dehydration of C5 sugars like xylose", 6],
             ["HMF", "Hydroxymethylfurfural: A platform chemical formed via the acid-catalyzed dehydration of C6 sugars like glucose", 6],
             ["ZSM-5 Upgrading", "The strategic use of a highly acidic, shape-selective zeolite catalyst to drive cracking and aromatization of pyrolysis vapors into BTX", 6],
-            ["Hydrothermal Liquefaction (HTL)", "Thermochemical conversion of wet biomass under high pressure and temperature (250-350°C) to produce energy-dense bio-crude", 6],
+            ["Hydrothermal Liquefaction", "Thermochemical conversion of wet biomass under high pressure and temperature (250-350°C) to produce energy-dense bio-crude", 6],
             ["Gasification", "High-temperature partial oxidation of biomass (>700°C) to produce syngas (CO and H2)", 6],
-            ["Fischer-Tropsch Synthesis", "A catalytic process that converts biomass-derived syngas into liquid long-chain hydrocarbons like renewable diesel", 6],
-            ["Catalytic Fast Pyrolysis (CFP)", "In-situ or ex-situ integration of catalysts during pyrolysis to immediately deoxygenate vapors and increase bio-oil stability", 6],
+            ["Fischer-Tropsch", "A catalytic process that converts biomass-derived syngas into liquid long-chain hydrocarbons like renewable diesel", 6],
             ["Levulinic Acid", "A highly valuable organic platform chemical produced from the acidic aqueous degradation of HMF", 6],
             ["Bio-char", "The carbon-rich solid coproduct of pyrolysis, highly valued for carbon sequestration and soil amendment", 6],
             ["Torrefaction", "A mild thermal pretreatment (200-300°C) in absence of oxygen that makes biomass brittle and hydrophobic, increasing energy density", 6],
-            ["Hydrodeoxygenation (HDO)", "A catalytic upgrading process utilizing high-pressure hydrogen to remove oxygen from bio-oil, creating drop-in hydrocarbon fuels", 6],
-            ["BTX Aromatics", "Benzene, Toluene, and Xylene: High-value industrial petrochemicals that can be synthesized via catalytic cracking of lignin", 6],
-            ["Water-Gas Shift Reaction", "A critical thermochemical reaction reacting carbon monoxide with water vapor to form carbon dioxide and hydrogen gas", 6],
+            ["Hydrodeoxygenation", "A catalytic upgrading process utilizing high-pressure hydrogen to remove oxygen from bio-oil, creating drop-in hydrocarbon fuels", 6],
 
             // ADVANCED SELF-ASSEMBLY & LNP (7)
             ["Chiral Nematic", "The spontaneous, entropy-driven cholesteric liquid crystalline self-assembly of CNCs modeled by Onsager's theory", 7],
@@ -205,39 +192,31 @@
             ["Coffee-Ring Effect", "The macroscopic accumulation of suspended nanoparticles at the perimeter of an evaporating drop, dictated by capillary flow", 7],
             ["Bouligand Structure", "The twisted, helicoidal plywood-like solid architecture resulting from the evaporation and kinetic trapping of cholesteric CNCs", 7],
             ["Cholesteric Pitch", "The exact axial distance required for the chiral nematic director of assembling CNCs to rotate a full 360 degrees", 7],
-            ["Anti-Solvent Precipitation", "A technique driving lignin self-assembly into uniform nanoparticles by rapidly shifting solvent polarity (e.g., adding water to THF)", 7],
+            ["Anti-Solvent Precipitation", "A technique driving lignin self-assembly into uniform nanoparticles by rapidly shifting solvent polarity", 7],
             ["Depletion Attraction", "An entropic thermodynamic force causing large colloidal nanoparticles to aggregate when smaller non-adsorbing polymers are present", 7],
-            ["Supramolecular Hydrogels", "Advanced 3D polymer networks strictly held together by reversible non-covalent interactions (e.g., host-guest, hydrogen bonding)", 7],
-            ["Lignin Nanoparticles (LNPs)", "Colloidal spheres formed via self-assembly, utilized for UV-shielding and controlled release due to high antioxidant activity", 7],
+            ["Supramolecular Hydrogels", "Advanced 3D polymer networks strictly held together by reversible non-covalent interactions", 7],
+            ["Lignin Nanoparticles", "Colloidal spheres formed via self-assembly, utilized for UV-shielding and controlled release due to high antioxidant activity", 7],
             ["π-π Stacking", "Strong non-covalent attractive forces between aromatic rings driving the dense packing of lignin macromolecules in solution", 7],
             ["J-Aggregates", "A highly ordered supramolecular assembly of aromatic molecules characterized by a red-shifted absorption spectrum", 7],
             ["H-Aggregates", "A highly ordered supramolecular assembly characterized by a blue-shifted absorption spectrum, common in concentrated lignin", 7],
             ["Hollow LNPs", "Engineered lignin nanocapsules synthesized via sacrificial core templates or aerosol flow, ideal for drug delivery", 7],
-            ["Critical Micelle Concentration", "The specific threshold concentration at which amphiphilic lignin molecules spontaneously self-assemble into core-shell micelles", 7],
-            ["Dynamic Light Scattering (DLS)", "A physics technique measuring the Brownian motion of nanoparticles in suspension to determine their exact hydrodynamic radius", 7],
-            ["Structural Color", "Brilliant, iridescent optical properties generated entirely by the physical interference of light within a chiral nematic CNC film", 7],
-            ["Isotropic-Anisotropic Phase", "The critical concentration threshold where a random dispersion of CNCs spontaneously aligns into ordered liquid crystals", 7],
 
             // INDUSTRY SCALE & TECHNO-ECONOMICS (8)
-            ["Techno-Economic Analysis (TEA)", "A comprehensive economic modeling framework used to calculate capital costs, operating costs, and Minimum Selling Price", 8],
-            ["Life Cycle Assessment (LCA)", "A standardized methodology (ISO 14040) used to quantify the total environmental impacts and carbon footprint of a product", 8],
-            ["Minimum Fuel Selling Price (MFSP)", "The critical economic breakeven point calculated in a TEA, determining if a biofuel can compete with petroleum derivatives", 8],
+            ["Techno-Economic Analysis", "A comprehensive economic modeling framework used to calculate capital costs, operating costs, and Minimum Selling Price", 8],
+            ["Life Cycle Assessment", "A standardized methodology (ISO 14040) used to quantify the total environmental impacts and carbon footprint of a product", 8],
+            ["Minimum Fuel Selling Price", "The critical economic breakeven point calculated in a TEA, determining if a biofuel can compete with petroleum derivatives", 8],
             ["Alcohol-to-Jet (ATJ)", "An industrial pathway that dehydrates, oligomerizes, and hydrogenates bio-ethanol or bio-isobutanol into Sustainable Aviation Fuel (SAF)", 8],
             ["HEFA Pathway", "Hydroprocessed Esters and Fatty Acids: Currently the dominant commercial pathway for SAF, utilizing waste fats and vegetable oils", 8],
             ["Kraft Recovery Boiler", "The massive industrial unit at pulp mills responsible for combusting black liquor, recovering sodium chemicals, and generating facility steam", 8],
             ["Black Liquor", "The highly alkaline, energy-dense byproduct stream of the Kraft process containing dissolved lignin and hemicellulose", 8],
-            ["Sustainable Aviation Fuel (SAF)", "Drop-in compatible jet fuels derived from renewable biomass, critically required to decarbonize the aviation sector", 8],
+            ["Sustainable Aviation Fuel", "Drop-in compatible jet fuels derived from renewable biomass, critically required to decarbonize the aviation sector", 8],
             ["Lignosulfonates", "Water-soluble sulfonated technical lignins derived from sulfite pulping, sold commercially as concrete plasticizers and dispersants", 8],
-            ["Biorefinery", "An integrated industrial facility that fractionates biomass into a portfolio of fuels, power, and high-value chemicals", 8],
-            ["CAPEX (Capital Expenditure)", "The total upfront financial investment required to design, construct, and commission a commercial biorefinery", 8],
-            ["OPEX (Operating Expenditure)", "The ongoing costs of running a biorefinery, primarily dominated by feedstock prices, enzyme costs, and utilities", 8],
+            ["CAPEX", "The total upfront financial investment required to design, construct, and commission a commercial biorefinery", 8],
+            ["OPEX", "The ongoing costs of running a biorefinery, primarily dominated by feedstock prices, enzyme costs, and utilities", 8],
             ["Nth-Plant Economics", "A TEA assumption modeling a mature facility, stripping away the massive risk premiums and contingencies of a pioneer plant", 8],
             ["Pioneer Plant", "The very first commercial-scale implementation of a new bioprocess, typically suffering from severe delays and cost overruns", 8],
             ["Lang Factor", "A rapid cost-estimation multiplier used in preliminary TEA to convert total equipment costs into total installed plant costs", 8],
             ["Functional Unit", "The quantified reference unit in an LCA (e.g., '1 MJ of SAF') to which all environmental impacts are normalized", 8],
-            ["System Boundary", "The defined limits in an LCA dictating exactly which life-cycle stages (e.g., cradle-to-gate) are included in the analysis", 8],
-            ["Allocation", "The LCA methodological challenge of dividing environmental burdens among multiple co-products (e.g., ethanol and lignin)", 8],
-            ["Global Warming Potential (GWP)", "An LCA metric expressing the radiative forcing impact of various greenhouse gases relative to CO2 over a 100-year timeframe", 8],
             ["LignoBoost Process", "A commercial industrial technology utilizing CO2 precipitation to extract high-purity Kraft lignin directly from black liquor", 8],
             ["LignoForce System", "An advanced commercial variation of LignoBoost utilizing an oxidation step to improve lignin filterability and reduce odor", 8],
             ["Black Liquor Gasification", "An advanced, high-efficiency alternative to the recovery boiler that converts black liquor directly into valuable syngas", 8]
@@ -333,21 +312,37 @@
                 setTimeout(() => setFloaters(prev => prev.filter(f => f.id !== id)), 1200);
             };
 
+            // 🔥 BULLETPROOF RANDOMIZER (FIXES GHOST BUTTON BUG) 🔥
             const pullNextEncounter = (currentDeck) => {
                 let activeDeck = [...currentDeck];
                 if (activeDeck.length === 0) activeDeck = [...DB].sort(() => Math.random() - 0.5);
 
                 const target = activeDeck.pop();
-                const distractors = DB.filter(item => item.term !== target.term).sort(() => Math.random() - 0.5);
-                let options = [target.term];
                 
-                const sameCat = distractors.filter(d => d.cat === target.cat);
-                if (sameCat.length > 0) options.push(sameCat.pop().term);
+                // Use a JavaScript Set to guarantee options are mathematically unique
+                let uniqueOptions = new Set([target.term]);
                 
-                while (options.length < 4 && distractors.length > 0) options.push(distractors.pop().term);
-                options.sort(() => Math.random() - 0.5);
+                // Exclude the target from the pool
+                let pool = DB.filter(item => item.term !== target.term).sort(() => Math.random() - 0.5);
+                
+                // Try to get 1 tricky distractor from the same category
+                const sameCatIndex = pool.findIndex(d => d.cat === target.cat);
+                if (sameCatIndex !== -1) {
+                    uniqueOptions.add(pool[sameCatIndex].term);
+                    pool.splice(sameCatIndex, 1); // remove from pool so it's not picked again
+                }
+                
+                // Fill the rest until we have exactly 4 unique options
+                let i = 0;
+                while (uniqueOptions.size < 4 && i < pool.length) {
+                    uniqueOptions.add(pool[i].term);
+                    i++;
+                }
 
-                return { target, options, updatedDeck: activeDeck };
+                // Convert Set back to Array and shuffle
+                const finalOptions = Array.from(uniqueOptions).sort(() => Math.random() - 0.5);
+
+                return { target, options: finalOptions, updatedDeck: activeDeck };
             };
 
             const startGame = () => {
@@ -433,7 +428,7 @@
                             <h1 className="text-4xl md:text-5xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 font-fantasy drop-shadow-md tracking-tight">
                                 BIOMANCER
                             </h1>
-                            <p className="text-emerald-400/80 mb-6 text-sm font-bold uppercase tracking-widest font-tech">Ultimate DB: 500+ Entities</p>
+                            <p className="text-emerald-400/80 mb-6 text-sm font-bold uppercase tracking-widest font-tech">Ultimate DB: 400+ Entities</p>
                             
                             <button onClick={startGame} className="w-full relative group overflow-hidden rounded-xl p-[2px] transition-transform active:scale-95 shadow-xl shadow-emerald-900/30">
                                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-cyan-500 opacity-80 group-hover:opacity-100 transition-opacity"></div>
