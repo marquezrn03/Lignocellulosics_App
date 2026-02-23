@@ -421,7 +421,12 @@
                 ? totalTime 
                 : totalTime + Math.max(0, (currentTime - roundStart) / 1000);
 
-            const displayTime = liveTotalSeconds.toFixed(1);
+            // Format to MM:SS
+            const totalLiveInt = Math.floor(liveTotalSeconds);
+            const displayMins = Math.floor(totalLiveInt / 60).toString().padStart(2, '0');
+            const displaySecs = (totalLiveInt % 60).toString().padStart(2, '0');
+            const displayTime = `${displayMins}:${displaySecs}`;
+            
             const avgTimeDisplay = attempts > 0 ? (totalTime / attempts).toFixed(1) : "0.0";
 
             // Sync Mute State
@@ -813,7 +818,7 @@
                         <div className="absolute left-1/2 top-4 -translate-x-1/2 flex flex-col items-center z-20">
                             <div className="flex items-center gap-1.5 bg-black/60 border border-emerald-500/30 rounded-full px-3 py-1 shadow-[0_0_10px_rgba(16,185,129,0.2)] text-emerald-400">
                                 <IconClock size={16} /> 
-                                <span className="font-tech text-xs md:text-sm font-bold tracking-widest w-12 text-center">{displayTime}</span>
+                                <span className="font-tech text-xs md:text-sm font-bold tracking-widest w-14 text-center">{displayTime}</span>
                             </div>
                             <span className="text-[0.5rem] md:text-[0.6rem] text-emerald-500/70 mt-1 font-tech uppercase tracking-widest">
                                 {attempts > 0 ? `Avg: ${avgTimeDisplay}s` : 'Timer Active'}
