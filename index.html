@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Biomancer RPG - Hardcore Master Edition</title>
+    <title>Biomancer RPG - Arcade Edition</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -50,6 +50,7 @@
     </style>
 </head>
 <body>
+    <!-- Fallback Loader -->
     <div id="initial-loader" style="height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #030712; color: #10b981; font-family: 'Share Tech Mono', monospace;">
         <div class="loader-ring"></div>
         <h2 style="margin-top: 20px; font-size: 1.25rem; letter-spacing: 0.1em; animation: pulse 2s infinite;">LOADING OMNI-DB...</h2>
@@ -59,7 +60,6 @@
     <script type="text/babel">
         // ---------------------------------------------------------------------------------
         // MASSIVELY EXPANDED OMNI-DATABASE (350+ CONCEPTS)
-        // Categories: 0:Comp, 1:Pretreat, 2:Chem, 3:Cat, 4:Nano, 5:Analyt, 6:Thermo, 7:SelfAssem, 8:Industry/TEA
         // ---------------------------------------------------------------------------------
         const rawDB = [
             // CATEGORY 0: COMPOSITION & STRUCTURE
@@ -299,22 +299,7 @@
             ["OSBL (Outside Battery Limits)", "TEA terminology referring to supporting infrastructure, such as wastewater treatment, cooling towers, and storage tanks", 8]
         ];
 
-        // Format and lock the database
         const DB = rawDB.map(r => ({ term: r[0], def: r[1], cat: r[2] }));
-
-        // ---------------------------------------------------------------------------------
-        // FACT-CHECKED INDUSTRY BREAKTHROUGHS (DECK)
-        // ---------------------------------------------------------------------------------
-        const BREAKTHROUGHS = [
-            { date: "Current Trajectory", title: "AI-Driven Enzyme Engineering", content: "Leveraging deep-learning models like AlphaFold3, biotech firms are accelerating the design of oxidation-resistant LPMOs, significantly reducing commercial enzyme loading costs." },
-            { date: "Regulatory Shift", title: "ReFuelEU Aviation Mandate Enforced", content: "With the EU's mandatory 2% SAF blending requirement actively enforced starting in 2025, capital influx into lignocellulosic ATJ scale-ups has surged globally." },
-            { date: "Pilot Scale-up", title: "Lignin-Based Carbon Fiber Pilots", content: "Overcoming historical spinning bottlenecks, advanced pilot facilities are demonstrating continuous melt-spinning of fractionated Kraft lignin into automotive-grade carbon fiber precursors." },
-            { date: "Process Engineering", title: "DES Recovery Breakthroughs", content: "A major economic hurdle for Deep Eutectic Solvents is being addressed as pilots demonstrate >99% solvent recovery across continuous hardwood fractionation cycles, vastly improving TEA metrics." },
-            { date: "Strain Engineering", title: "CBP Scale-Up Milestones", content: "CRISPR-engineered consolidated bioprocessing (CBP) strains have achieved unprecedented ethanol tolerance, fermenting directly from minimally pretreated biomass." },
-            { date: "Material Science", title: "CNF Barrier Packaging Commercialized", content: "Major packaging conglomerates have successfully replaced synthetic EVOH barriers with fluorinated CNF coatings, achieving superior oxygen and water vapor transmission rates (OTR/WVTR)." },
-            { date: "Industry Expansion", title: "LignoBoost Global Rollout", content: "Multiple major Kraft pulp mills have successfully integrated LignoBoost units, flooding the market with technical lignin targeted for phenolic resin substitution." },
-            { date: "Biochemicals", title: "FDCA Market Parity Achieved", content: "Advances in the catalytic oxidation of HMF have brought the production cost of FDCA to parity with purified terephthalic acid, paving the way for 100% bio-based PEF plastics." }
-        ];
 
         // ---------------------------------------------------------------------------------
         // UI CONFIGURATIONS
@@ -347,14 +332,15 @@
         const IconShield = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
         const IconSkull = () => <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2M12.5 17l-.5-1-.5 1h1zM16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>;
         const IconSword = () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg>;
-        const IconGlobe = () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
         const IconTrophy = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
         const IconClock = ({ size = 32, className = "" }) => <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
         const IconTree = ({ size = 20, className = "" }) => <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22v-5"/><path d="M12 17l-6-6h4l-4-5h12l-4 5h4z"/></svg>;
         const IconVolumeOn = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>;
         const IconVolumeOff = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="1" x2="1" y2="23"/></svg>;
 
-        // --- 8-BIT PROCEDURAL SYNTHESIZER ---
+        // ---------------------------------------------------------------------------------
+        // 8-BIT PROCEDURAL SYNTHESIZER
+        // ---------------------------------------------------------------------------------
         class SynthEngine {
             constructor() {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -399,20 +385,20 @@
                 if(!this.isPlaying) return;
                 while(this.nextNoteTime < this.ctx.currentTime + 0.1) {
                     this.playNote();
-                    this.nextNoteTime += 0.25; // 120 BPM 8th notes
+                    this.nextNoteTime += 0.25; 
                 }
                 this.timerID = setTimeout(() => this.schedule(), 25);
             }
             playNote() {
                 if(this.isMuted) return;
-                const notes = [73.42, 110.00, 116.54, 87.31]; // D2, A2, Bb2, F2 (Ominous Phrygian)
+                const notes = [73.42, 110.00, 116.54, 87.31]; 
                 const seq = [0, 1, 2, 1, 0, 3, 2, 3];
                 const freq = notes[seq[this.noteIdx % seq.length]];
                 this.noteIdx++;
                 
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-                osc.type = 'square'; // Classic 8-bit sound
+                osc.type = 'square'; 
                 osc.frequency.setValueAtTime(freq, this.nextNoteTime);
                 gain.gain.setValueAtTime(0.15, this.nextNoteTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, this.nextNoteTime + 0.2);
@@ -424,6 +410,9 @@
             }
         }
 
+        // ---------------------------------------------------------------------------------
+        // ERROR BOUNDARY
+        // ---------------------------------------------------------------------------------
         class ErrorBoundary extends React.Component {
             constructor(props) { super(props); this.state = { hasError: false, error: null }; }
             static getDerivedStateFromError(error) { return { hasError: true, error }; }
@@ -451,7 +440,6 @@
             const [bestXp, setBestXp] = React.useState(0);
             
             const [deck, setDeck] = React.useState([]);
-            const [newsDeck, setNewsDeck] = React.useState([]); // Randomized News Deck
             const [questionsAnswered, setQuestionsAnswered] = React.useState(0);
 
             const [encounter, setEncounter] = React.useState(null);
@@ -464,9 +452,8 @@
             const floatIdRef = React.useRef(0);
 
             const [overlay, setOverlay] = React.useState(null); 
-            const [currentNews, setCurrentNews] = React.useState(null);
 
-            // Audio Tracking States
+            // Audio States
             const [isMuted, setIsMuted] = React.useState(false);
             const audioEngine = React.useRef(null);
 
@@ -489,7 +476,6 @@
                 ? totalTime 
                 : totalTime + Math.max(0, (currentTime - roundStart) / 1000);
 
-            // Format to MM:SS
             const totalLiveInt = Math.floor(liveTotalSeconds);
             const displayMins = Math.floor(totalLiveInt / 60).toString().padStart(2, '0');
             const displaySecs = (totalLiveInt % 60).toString().padStart(2, '0');
@@ -545,18 +531,15 @@
 
             const startGame = () => {
                 setHp(100); setXp(0); setCombo(1); setQuestionsAnswered(0);
-                setTotalTime(0); setAttempts(0); // Reset Timers
+                setTotalTime(0); setAttempts(0);
                 
-                // Shuffle both decks
                 const initialDeck = [...DB].sort(() => Math.random() - 0.5);
-                setNewsDeck([...BREAKTHROUGHS].sort(() => Math.random() - 0.5));
-                
                 const result = pullNextEncounter(initialDeck);
                 setDeck(result.updatedDeck);
                 setEncounter({ target: result.target, options: result.options });
                 setOverlay(null); setView('combat');
                 
-                // Start Procedural Synth Engine
+                // Start Procedural Synth
                 if (!audioEngine.current) {
                     audioEngine.current = new SynthEngine();
                 }
@@ -573,13 +556,11 @@
                 setSelectedId(chosenTerm);
                 const isCorrect = chosenTerm === encounter.target.term;
 
-                // Freeze exact time and add to total
                 const timeTaken = Math.max(0, (currentTime - roundStart) / 1000);
                 setTotalTime(prev => prev + timeTaken);
                 setAttempts(prev => prev + 1);
 
                 if (isCorrect) {
-                    // Play 8-bit Sword Hit
                     audioEngine.current?.playHit();
 
                     setEnemyHit(true);
@@ -597,39 +578,25 @@
                     setTimeout(() => {
                         setEnemyHit(false); setSelectedId(null);
                         
+                        // Performance Review EVERY 10 rounds ONLY
                         if (newCount % 10 === 0) {
-                            // Every 10 rounds: Time Performance Review
                             setHp(prev => Math.min(100, prev + 25)); // Heal 25 HP
                             setOverlay('time-check');
-                        } else if (newCount % 5 === 0) {
-                            // Every 5 rounds: Industry News
-                            let currentNewsDeck = [...newsDeck];
-                            if (currentNewsDeck.length === 0) {
-                                currentNewsDeck = [...BREAKTHROUGHS].sort(() => Math.random() - 0.5);
-                            }
-                            const pulledNews = currentNewsDeck.pop();
-                            
-                            setNewsDeck(currentNewsDeck);
-                            setCurrentNews(pulledNews);
-                            setHp(prev => Math.min(100, prev + 25)); // Heal 25 HP
-                            setOverlay('news');
                         } else {
                             const result = pullNextEncounter(deck);
                             setDeck(result.updatedDeck);
                             setEncounter({ target: result.target, options: result.options });
                             const now = Date.now();
-                            setRoundStart(now); // Restart Clock
+                            setRoundStart(now); 
                             setCurrentTime(now);
                         }
                     }, 800);
                 } else {
-                    // Play 8-bit Fail Impact
                     audioEngine.current?.playFail();
 
                     setShake(true); setFlashRed(true);
                     setTimeout(() => { setShake(false); setFlashRed(false); }, 400);
                     
-                    // 4 FAILS = DEATH (100 / 4 = 25 damage per hit)
                     spawnFloater(`-25 HP`, 'dmg');
                     setCombo(1);
                     setTimeout(() => setOverlay('wrong'), 500);
@@ -637,7 +604,7 @@
             };
 
             const resolveDamage = () => {
-                const newHp = hp - 25; // 25 Damage implemented
+                const newHp = hp - 25; 
                 setHp(newHp); setOverlay(null); setSelectedId(null);
                 
                 if (newHp <= 0) {
@@ -648,19 +615,9 @@
                     setDeck(result.updatedDeck);
                     setEncounter({ target: result.target, options: result.options });
                     const now = Date.now();
-                    setRoundStart(now); // Restart Clock
+                    setRoundStart(now);
                     setCurrentTime(now);
                 }
-            };
-
-            const collectNews = () => {
-                setOverlay(null);
-                const result = pullNextEncounter(deck);
-                setDeck(result.updatedDeck);
-                setEncounter({ target: result.target, options: result.options });
-                const now = Date.now();
-                setRoundStart(now); // Restart Clock
-                setCurrentTime(now);
             };
 
             const dismissTimeCheck = () => {
@@ -669,7 +626,7 @@
                 setDeck(result.updatedDeck);
                 setEncounter({ target: result.target, options: result.options });
                 const now = Date.now();
-                setRoundStart(now); // Restart Clock
+                setRoundStart(now); 
                 setCurrentTime(now);
             };
 
@@ -776,7 +733,7 @@
                     >
                         {isMuted ? <IconVolumeOff size={20} /> : <IconVolumeOn size={20} />}
                     </button>
-
+                    
                     {floaters.map(f => (
                         <div key={f.id} style={{ left: '50%', top: '30%' }} className={`combat-text ${f.type === 'dmg' ? 'text-red-500 text-5xl' : f.type === 'combo' ? 'text-yellow-400 text-3xl' : 'text-emerald-400 text-5xl'}`}>
                             {f.text}
@@ -830,31 +787,6 @@
                                 </div>
                                 <button onClick={dismissTimeCheck} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform relative z-10 text-lg font-tech">
                                     RESUME ANALYSIS
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {overlay === 'news' && currentNews && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-                            <div className="glass-card border border-blue-500/50 p-6 md:p-8 rounded-2xl w-full max-w-md shadow-[0_0_60px_rgba(59,130,246,0.2)] anim-float relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full"></div>
-                                <div className="flex items-center gap-3 mb-5 relative z-10">
-                                    <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400"><IconGlobe /></div>
-                                    <div>
-                                        <h2 className="text-2xl font-black text-white font-tech tracking-wide">INDUSTRY NEWS</h2>
-                                        <p className="text-blue-400 font-bold text-xs uppercase tracking-wider">+25 Vitality</p>
-                                    </div>
-                                </div>
-                                <div className="bg-black/60 rounded-xl p-5 mb-6 border border-blue-900/50 relative z-10">
-                                    <div className="flex justify-between items-end border-b border-blue-900/50 pb-2 mb-3">
-                                        <h3 className="text-blue-400 font-bold uppercase tracking-widest text-sm">{currentNews.title}</h3>
-                                        <span className="text-xs text-blue-500 font-tech bg-blue-950/50 px-2 py-0.5 rounded">{currentNews.date}</span>
-                                    </div>
-                                    <p className="text-gray-300 text-sm md:text-base leading-relaxed">"{currentNews.content}"</p>
-                                </div>
-                                <button onClick={collectNews} className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform relative z-10 text-lg font-tech">
-                                    RETURN TO WORK
                                 </button>
                             </div>
                         </div>
@@ -939,3 +871,5 @@
     </script>
 </body>
 </html>
+
+
