@@ -408,7 +408,11 @@
                 return () => clearInterval(interval);
             }, [view, overlay, selectedId]);
 
-            const currentRoundSeconds = Math.max(0, ((currentTime - roundStart) / 1000)).toFixed(1);
+            const liveTotalSeconds = (selectedId || overlay) 
+                ? totalTime 
+                : totalTime + Math.max(0, (currentTime - roundStart) / 1000);
+
+            const displayTime = liveTotalSeconds.toFixed(1);
             const avgTimeDisplay = attempts > 0 ? (totalTime / attempts).toFixed(1) : "0.0";
 
             const levelIdx = React.useMemo(() => {
@@ -473,8 +477,8 @@
                 setSelectedId(chosenTerm);
                 const isCorrect = chosenTerm === encounter.target.term;
 
-                // Stop the clock for this specific round
-                const timeTaken = (Date.now() - roundStart) / 1000;
+                // Freeze exact time and add to total
+                const timeTaken = Math.max(0, (currentTime - roundStart) / 1000);
                 setTotalTime(prev => prev + timeTaken);
                 setAttempts(prev => prev + 1);
 
@@ -694,9 +698,15 @@
                                 </div>
                                 <div className="bg-black/60 rounded-xl p-5 mb-6 border border-emerald-900/50 relative z-10 text-center">
                                     <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-4">"System optimization detected. You are maintaining an excellent cognitive tempo!"</p>
-                                    <div className="inline-block border border-emerald-500/30 bg-emerald-950/40 rounded-lg px-6 py-3">
-                                        <p className="text-[0.65rem] text-gray-400 uppercase tracking-widest font-bold mb-1">Average Response Time</p>
-                                        <p className="text-3xl font-black text-emerald-400 font-tech">{(totalTime / attempts).toFixed(1)}s</p>
+                                    <div className="grid grid-cols-2 gap-4 border border-emerald-500/30 bg-emerald-950/40 rounded-lg p-4">
+                                        <div>
+                                            <p className="text-[0.65rem] text-gray-400 uppercase tracking-widest font-bold mb-1">Avg Time / Ans</p>
+                                            <p className="text-2xl font-black text-emerald-400 font-tech">{(totalTime / attempts).toFixed(1)}s</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[0.65rem] text-gray-400 uppercase tracking-widest font-bold mb-1">Total Time</p>
+                                            <p className="text-2xl font-black text-emerald-400 font-tech">{Math.floor(totalTime / 60)}m {Math.floor(totalTime % 60)}s</p>
+                                        </div>
                                     </div>
                                 </div>
                                 <button onClick={dismissTimeCheck} className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform relative z-10 text-lg font-tech">
@@ -747,7 +757,7 @@
                         <div className="absolute left-1/2 top-4 -translate-x-1/2 flex flex-col items-center z-20">
                             <div className="flex items-center gap-1.5 bg-black/60 border border-emerald-500/30 rounded-full px-3 py-1 shadow-[0_0_10px_rgba(16,185,129,0.2)] text-emerald-400">
                                 <IconClock size={16} /> 
-                                <span className="font-tech text-xs md:text-sm font-bold tracking-widest w-8 text-center">{selectedId ? '--' : currentRoundSeconds}</span>
+                                <span className="font-tech text-xs md:text-sm font-bold tracking-widest w-12 text-center">{displayTime}</span>
                             </div>
                             <span className="text-[0.5rem] md:text-[0.6rem] text-emerald-500/70 mt-1 font-tech uppercase tracking-widest">
                                 {attempts > 0 ? `Avg: ${avgTimeDisplay}s` : 'Timer Active'}
@@ -810,5 +820,3 @@
     </script>
 </body>
 </html>
-
-
